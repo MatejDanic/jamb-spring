@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javassist.NotFoundException;
+// import javassist.NotFoundException;
 
-import com.google.common.util.concurrent.RateLimiter;
+// import com.google.common.util.concurrent.RateLimiter;
 
 import matej.api.services.FormService;
 import matej.exceptions.IllegalMoveException;
@@ -54,7 +55,7 @@ public class FormController {
 		// if (!rateLimiter.tryAcquire(1)) return null;
 		try {
 			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)), HttpStatus.OK);
-		} catch (NotFoundException e) {
+		} catch (UsernameNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -63,7 +64,7 @@ public class FormController {
 	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id) {
 		try {
 			return new ResponseEntity<>(formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id), HttpStatus.OK);
-		} catch (NotFoundException e) {
+		} catch (UsernameNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}

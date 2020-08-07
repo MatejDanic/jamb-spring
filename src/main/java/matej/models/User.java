@@ -24,10 +24,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(mappedBy="user", cascade = CascadeType.ALL)
     private Set<Score> scores;
 
-    @OneToOne(mappedBy="user")
+    @OneToOne(mappedBy="user", cascade = CascadeType.ALL)
     private Form form;
     
     @javax.persistence.Column(name="username", nullable=false, unique=true)

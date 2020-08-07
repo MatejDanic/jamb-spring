@@ -49,13 +49,14 @@ public class FormService {
 	@Autowired
 	UserRepository userRepo;
 
-	public Optional<Form> initializeForm(String username) throws NotFoundException {
+	public Optional<Form> initializeForm(String username) throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		if (user.getForm() != null) {
+		if (user.getForm().getId() >= 0) {
 			return formRepo.findById(user.getForm().getId());
 		}
 		Form form = JambFactory.createForm(user);
-		form = formRepo.save(form);
+		user.setForm(form);
+		userRepo.save(user);
 		return formRepo.findById(form.getId());
 	}	
 	
@@ -65,7 +66,7 @@ public class FormService {
 		formRepo.delete(form);
 	}
 
-	public boolean deleteFormById(String username, int id) throws NotFoundException {
+	public boolean deleteFormById(String username, int id) throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		if (user.getForm() != null) {
 			formRepo.deleteById(user.getForm().getId());
