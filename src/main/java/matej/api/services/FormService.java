@@ -64,6 +64,15 @@ public class FormService {
 		scoreRepo.save(score);
 		formRepo.delete(form);
 	}
+
+	public boolean deleteFormById(String username, int id) throws NotFoundException {
+		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		if (user.getForm() != null) {
+			formRepo.deleteById(user.getForm().getId());
+			return true;
+		}
+		return false;
+	}
 	
 	public void deleteForm(Form form) {
 		formRepo.delete(form);

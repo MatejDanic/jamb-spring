@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,7 +42,7 @@ public class FormController {
 	@Autowired
 	JwtUtils jwtUtils;
 
-	private final RateLimiter rateLimiter = RateLimiter.create(0.2);
+	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
 
 	// public String getUsername(@RequestHeader(value="Authorization") String
 	// headerAuth) {
@@ -50,10 +51,18 @@ public class FormController {
 
 	@PutMapping("")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
-		if (!rateLimiter.tryAcquire(1))
-			return null;
+		// if (!rateLimiter.tryAcquire(1)) return null;
 		try {
 			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)), HttpStatus.OK);
+		} catch (NotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id) {
+		try {
+			return new ResponseEntity<>(formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id), HttpStatus.OK);
 		} catch (NotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
