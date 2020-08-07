@@ -53,11 +53,12 @@ public class FormService {
 		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		if (user.getForm().getId() >= 0) {
 			return formRepo.findById(user.getForm().getId());
+		} else {
+			Form form = JambFactory.createForm(user);
+			user.setForm(form);
+			userRepo.save(user);
+			return formRepo.findById(user.getForm().getId());
 		}
-		Form form = JambFactory.createForm(user);
-		user.setForm(form);
-		userRepo.save(user);
-		return formRepo.findById(form.getId());
 	}	
 	
 	public void deleteForm(Form form, int finalSum) {
