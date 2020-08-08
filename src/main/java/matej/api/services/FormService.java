@@ -156,7 +156,7 @@ public class FormService {
 		return announcementOrdinal;
 	}
 
-	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
+	public Map<String, Integer> fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
 		
@@ -194,7 +194,7 @@ public class FormService {
 			formRepo.save(form);
 		}
 
-		return box.getValue();
+		return sums;
 	}
 
 	public Map<String, Integer> getSums(String username, int id) throws InvalidOwnershipException {
