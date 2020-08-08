@@ -197,6 +197,12 @@ public class FormService {
 		return box.getValue();
 	}
 
+	public Map<String, Integer> getSums(String username, int id) throws InvalidOwnershipException {
+		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		Form form = getFormById(id);
+		return form.calculateSums();
+	}
+
 	private boolean isFormCompleted(Form form) {
 		for (Column column : form.getColumns()) {
 			if (!column.isCompleted())
