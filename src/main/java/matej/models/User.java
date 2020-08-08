@@ -27,7 +27,7 @@ public class User {
     @OneToMany(mappedBy="user", cascade = CascadeType.ALL)
     private Set<Score> scores;
 
-    @OneToOne(mappedBy="user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy="user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private Form form;
     
     @javax.persistence.Column(name="username", nullable=false, unique=true)

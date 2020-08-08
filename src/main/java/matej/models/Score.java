@@ -17,7 +17,7 @@ public class Score {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@ManyToOne()
+	@ManyToOne
 	private User user;
 	
 	@javax.persistence.Column(name = "value", nullable = false)

@@ -61,7 +61,8 @@ public class FormController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id) {
+	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id)
+			throws InvalidOwnershipException {
 		try {
 			return new ResponseEntity<>(formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id), HttpStatus.OK);
 		} catch (UsernameNotFoundException e) {

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javassist.NotFoundException;
 import matej.api.repositories.BoxRepository;
 import matej.api.repositories.ColumnRepository;
 import matej.api.repositories.DiceRepository;
@@ -50,67 +49,84 @@ public class FormService {
 	UserRepository userRepo;
 
 	public Optional<Form> initializeForm(String username) throws UsernameNotFoundException {
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		if (user.getForm().getId() >= 0) {
+		User user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		if (user.getForm() != null) {
 			return formRepo.findById(user.getForm().getId());
 		} else {
+			System.out.println("Creating new form...");
 			Form form = JambFactory.createForm(user);
 			user.setForm(form);
 			userRepo.save(user);
 			return formRepo.findById(user.getForm().getId());
 		}
-	}	
-	
-	public void deleteForm(Form form, int finalSum) {
-		Score score = JambFactory.createScore(form.getUser(), finalSum);
-		scoreRepo.save(score);
-		formRepo.delete(form);
 	}
 
-	public boolean deleteFormById(String username, int id) throws UsernameNotFoundException {
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		if (user.getForm() != null) {
-			formRepo.deleteById(user.getForm().getId());
+	public boolean deleteFormById(String username, int id) throws InvalidOwnershipException {
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		return deleteForm(formRepo.getOne(id));
+	}
+
+	public boolean deleteForm(Form form, int finalSum) {
+		try {
+			Score score = JambFactory.createScore(form.getUser(), finalSum);
+			scoreRepo.save(score);
+			formRepo.delete(form);
 			return true;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 		return false;
 	}
-	
-	public void deleteForm(Form form) {
-		formRepo.delete(form);
+
+	public boolean deleteForm(Form form) {
+		try {
+			formRepo.delete(form);
+			return true;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
 	}
-	
+
 	public Form getFormById(int id) {
 		return formRepo.findById(id).get();
 	}
-	
+
 	public Column getColumn(int id, int columnTypeOrdinal) {
 		return getFormById(id).getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
 	}
-	
+
 	public Box getColumnBox(int id, int columnTypeOrdinal, int boxTypeOrdinal) {
-		return getFormById(id).getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal)).getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
+		return getFormById(id).getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal))
+				.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
 	}
-	
+
 	public List<Form> getFormList() {
 		return formRepo.findAll();
 	}
-	
-	public List<Dice> rollDice (String username, int id, Map<Integer, Boolean> diceToThrow) throws IllegalMoveException,
-			InvalidOwnershipException {
-		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+
+	public List<Dice> rollDice(String username, int id, Map<Integer, Boolean> diceToThrow)
+			throws IllegalMoveException, InvalidOwnershipException {
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
 		Form form = getFormById(id);
-		
-		if (form.getRollCount() == 0) diceToThrow.replaceAll((k,v) -> v = true);
-		else if (form.getRollCount() == JambConstants.NUM_OF_ROLLS) throw new IllegalMoveException("Dice roll limit reached!");
-		else if (form.getRollCount() > 0 && isAnnouncementRequired(form) && form.getAnnouncement() == null) throw new IllegalMoveException("Announcement is required!");
-		
+
+		if (form.getRollCount() == 0)
+			diceToThrow.replaceAll((k, v) -> v = true);
+		else if (form.getRollCount() == JambConstants.NUM_OF_ROLLS)
+			throw new IllegalMoveException("Dice roll limit reached!");
+		else if (form.getRollCount() > 0 && isAnnouncementRequired(form) && form.getAnnouncement() == null)
+			throw new IllegalMoveException("Announcement is required!");
+
 		if (form.getRollCount() < JambConstants.NUM_OF_ROLLS) {
 			form.setRollCount(form.getRollCount() + 1);
-			if (isAnnouncementRequired(form)) form.setAnnouncementRequired(true);
+			if (isAnnouncementRequired(form))
+				form.setAnnouncementRequired(true);
 			formRepo.save(form);
 		}
-		
+
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
 			Dice dice = form.getDiceByOrdinalNumber(entry.getKey());
 			if (entry.getValue()) {
@@ -122,60 +138,68 @@ public class FormService {
 		}
 		return form.getDice();
 	}
-	
-	public int announce(String username, int id, int announcementOrdinal) throws IllegalMoveException,
-			InvalidOwnershipException {
-		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
 
-		Form form  = getFormById(id);
-		
-		if (form.getAnnouncement() != null) throw new IllegalMoveException("Announcement already declared!");
-		if (form.getRollCount() >= 2) throw new IllegalMoveException("Announcement unavailable after second roll!");
-		
+	public int announce(String username, int id, int announcementOrdinal)
+			throws IllegalMoveException, InvalidOwnershipException {
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+
+		Form form = getFormById(id);
+
+		if (form.getAnnouncement() != null)
+			throw new IllegalMoveException("Announcement already declared!");
+		if (form.getRollCount() >= 2)
+			throw new IllegalMoveException("Announcement unavailable after second roll!");
+
 		form.setAnnouncement(BoxType.fromOrdinal(announcementOrdinal));
 		formRepo.save(form);
 		return announcementOrdinal;
 	}
-	
-	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal) throws IllegalMoveException,
-			InvalidOwnershipException {
-		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+
+	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
+			throws IllegalMoveException, InvalidOwnershipException {
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
 		Form form = getFormById(id);
 		Column column = form.getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
 		Box box = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
-		
-		if (box.isFilled()) throw new IllegalMoveException("Box already filled!");
-		else if (form.getRollCount() == 0) throw new IllegalMoveException("Cannot fill box without rolling dice!");
-		else if (!box.isAvailable() && form.getAnnouncement() == null) throw new IllegalMoveException("Box is currently not available!");
-		else if (form.getAnnouncement() != null && form.getAnnouncement() != box.getBoxType()) throw new IllegalMoveException("Box is not the same as announcement!");
-		
+
+		if (box.isFilled())
+			throw new IllegalMoveException("Box already filled!");
+		else if (form.getRollCount() == 0)
+			throw new IllegalMoveException("Cannot fill box without rolling dice!");
+		else if (!box.isAvailable() && form.getAnnouncement() == null)
+			throw new IllegalMoveException("Box is currently not available!");
+		else if (form.getAnnouncement() != null && form.getAnnouncement() != box.getBoxType())
+			throw new IllegalMoveException("Box is not the same as announcement!");
+
 		box.fill(form.getDice());
 		box.setColumn(column);
 		boxRepo.save(box);
-		
+
 		advanceColumn(form, columnTypeOrdinal, boxTypeOrdinal);
 		column.setForm(form);
 		columnRepo.save(column);
-		
+
 		Map<String, Integer> sums = form.calculateSums();
 		sums.put("boxValue", box.getValue());
-		
+
 		if (isFormCompleted(form)) {
 			// System.out.println("Deleting form...");
 			deleteForm(form, sums.get("finalSum"));
-		} else {			
+		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
 			formRepo.save(form);
 		}
-		
+
 		return box.getValue();
 	}
-	
 
 	private boolean isFormCompleted(Form form) {
 		for (Column column : form.getColumns()) {
-			if (!column.isCompleted()) return false;
+			if (!column.isCompleted())
+				return false;
 		}
 		return true;
 	}
@@ -195,11 +219,11 @@ public class FormService {
 			nextBox.setAvailable(true);
 			nextBox.setColumn(column);
 			boxRepo.save(nextBox);
-		} catch(IndexOutOfBoundsException e) {
-			//			e.printStackTrace();
+		} catch (IndexOutOfBoundsException e) {
+			// e.printStackTrace();
 		}
 	}
-	
+
 	private boolean isAnnouncementRequired(Form form) {
 		boolean announcementRequired = (form.getAnnouncement() == null);
 		// System.out.println(form);
@@ -208,15 +232,16 @@ public class FormService {
 				if (!column.isCompleted()) {
 					announcementRequired = false;
 					break;
-				}	
+				}
 			}
 		}
 		return announcementRequired;
 	}
 
 	private boolean checkOwnership(String username, int formId) {
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		User user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		return user.getForm().getId() == formId;
 	}
-	
+
 }
