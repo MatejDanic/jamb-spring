@@ -68,9 +68,9 @@ public class FormService {
 		return deleteForm(formRepo.getOne(id));
 	}
 
-	public boolean deleteForm(Form form, int finalSum) {
+	public boolean deleteForm(Form form, User user, int finalSum) {
 		try {
-			Score score = JambFactory.createScore(form.getUser(), finalSum);
+			Score score = JambFactory.createScore(user, finalSum);
 			scoreRepo.save(score);
 			formRepo.delete(form);
 			return true;
@@ -158,8 +158,9 @@ public class FormService {
 
 	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
 			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		
+		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		Form form = getFormById(id);
 		Column column = form.getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
 		Box box = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
@@ -186,7 +187,7 @@ public class FormService {
 
 		if (isFormCompleted(form)) {
 			// System.out.println("Deleting form...");
-			deleteForm(form, sums.get("finalSum"));
+			deleteForm(form, user, sums.get("finalSum"));
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
