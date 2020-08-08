@@ -35,6 +35,11 @@ public class HomeController {
 		response.setHeader("Location", "http://www.jamb.com.hr");
 		response.setStatus(302);
 	}
+
+	@GetMapping("/wake")
+	public String wake() {
+		return "yawn...";
+	}
 	
 	@GetMapping("/scores")
 	public List<Score> getLeaderboard() {
