@@ -1,5 +1,6 @@
 package matej.models;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -64,6 +65,7 @@ public class Column {
 	}
 
 	public List<Box> getBoxes() {
+		Collections.sort(boxes, (a, b) -> a.getBoxType().ordinal() < b.getBoxType().ordinal() ? -1 : a.getBoxType().ordinal() == b.getBoxType().ordinal() ? 0 : 1);
 		return boxes;
 	}
 

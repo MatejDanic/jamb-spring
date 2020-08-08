@@ -1,5 +1,6 @@
 package matej.models;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -64,6 +65,7 @@ public class Form {
 	}
 
 	public List<Column> getColumns() {
+		Collections.sort(columns, (a, b) -> a.getColumnType().ordinal() < b.getColumnType().ordinal() ? -1 : a.getColumnType().ordinal() == b.getColumnType().ordinal() ? 0 : 1);
 		return columns;
 	}
 
@@ -72,6 +74,7 @@ public class Form {
 	}
 
 	public List<Dice> getDice() {
+		Collections.sort(dice, (a, b) -> a.getLabel() < b.getLabel() ? -1 : a.getLabel() == b.getLabel() ? 0 : 1);
 		return dice;
 	}
 
@@ -135,18 +138,6 @@ public class Form {
 		sums.put("finalSum", sums.get("numberSum") + sums.get("diffSum") + sums.get("labelSum"));
 		return sums;
 	}
-	
-	// @Override
-	// public String toString() {
-	// 	String result = "";
-	// 	for (Column column : columns) {
-	// 		for (Box box : column.getBoxes()) {
-	// 			result += " " + box.getValue();
-	// 		}
-	// 		result += "\n";
-	// 	}
-	// 	return result;
-	// }
 
 	public void setAnnouncementRequired(boolean announcementRequired) {
 		this.announcementRequired = announcementRequired;
