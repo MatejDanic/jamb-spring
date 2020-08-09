@@ -32,7 +32,7 @@ import matej.security.jwt.JwtUtils;
 import matej.security.services.UserDetailsImpl;
 
 @RestController
-@CrossOrigin(origins="*")
+@CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
 @RequestMapping("/auth")
 public class AuthController {
 	

@@ -16,7 +16,7 @@ import matej.constants.JambConstants;
 
 
 @RestController
-@CrossOrigin(origins="*")
+@CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
 @RequestMapping("")
 public class HomeController {
 	
