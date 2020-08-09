@@ -27,8 +27,8 @@ public class Form {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@JsonIgnore
 	@OneToOne
+	@JsonIgnore
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	

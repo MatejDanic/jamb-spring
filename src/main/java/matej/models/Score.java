@@ -7,8 +7,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name="score")
@@ -19,6 +22,8 @@ public class Score {
 	private int id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
 	@javax.persistence.Column(name = "value", nullable = false)
