@@ -23,7 +23,7 @@ public class Score {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
-	@JoinColumn(name = "username", nullable = false)
+	@JoinColumn(name = "user", nullable = false)
 	private User user;
 
 	@javax.persistence.Column(name = "username", nullable = true)
