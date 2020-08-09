@@ -1,7 +1,5 @@
 package matej.api.controllers;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.ScoreService;
 import matej.constants.JambConstants;
-import matej.models.Score;
 
 
 @RestController
