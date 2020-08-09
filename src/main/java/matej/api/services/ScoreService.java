@@ -21,17 +21,6 @@ public class ScoreService {
 
 	@Autowired
 	ScoreRepository scoreRepo;
-	
-	public void clearUnfinishedScores() {
-		Queue<Score> queue = new LinkedList<>();
-		LocalDate today = LocalDate.now();
-		for (Score score : scoreRepo.findAll()) {
-			if (score.getDate().isBefore(today)) {
-				queue.add(score);
-			}
-		}
-		scoreRepo.deleteAll(queue);
-	}
 
 	public List<Score> getLeaderboard(int max) {
 		List<Score> leaderBoard = scoreRepo.findAll();

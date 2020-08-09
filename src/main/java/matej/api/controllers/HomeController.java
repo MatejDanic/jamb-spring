@@ -5,7 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +23,6 @@ public class HomeController {
 	
 	@Autowired
 	ScoreService scoreService;
-	
-	@Scheduled(fixedRate = 86400000)
-	public void clearUnfinishedScores() {
-		scoreService.clearUnfinishedScores();
-	}
 	
 	@GetMapping("")
 	public void handleGet(HttpServletResponse response) {
