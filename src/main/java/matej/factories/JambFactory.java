@@ -34,6 +34,7 @@ public class JambFactory {
 		Score score = new Score();
 		score.setUser(user);
 		score.setUsername(user.getUsername());
+		score.setFinished(true);
 		score.setValue(finalSum);
 		score.setDate(LocalDate.now());
 		return score;
