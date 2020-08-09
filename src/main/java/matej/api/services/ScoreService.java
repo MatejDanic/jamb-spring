@@ -1,11 +1,11 @@
 package matej.api.services;
 
-import java.time.LocalDate;
+// import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
+// import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+// import java.util.Queue;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import matej.api.repositories.ScoreRepository;
 import matej.models.Score;
-import matej.utils.DateUtil;
+// import matej.utils.DateUtil;
 
 
 @Service

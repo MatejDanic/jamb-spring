@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,8 +38,12 @@ public class HomeController {
 	}
 	
 	@GetMapping("/scores")
-	public List<Score> getLeaderboard() {
-		return scoreService.getLeaderboard(JambConstants.LEADERBOARD_LIMIT);
+	public ResponseEntity<Object> getLeaderboard() {
+		try {
+			return new ResponseEntity<>(scoreService.getLeaderboard(JambConstants.LEADERBOARD_LIMIT), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	@GetMapping("/admin")
