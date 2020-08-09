@@ -25,9 +25,6 @@ public class Score {
 	
 	@javax.persistence.Column(name = "date", nullable = false)
 	private LocalDate date;
-	
-	@javax.persistence.Column(name = "finished", nullable = false)
-	private boolean finished;
 
 	public int getId() {
 		return id;
@@ -59,13 +56,5 @@ public class Score {
 	
 	public void setDate(LocalDate date) {
 		this.date = date;
-	}
-	
-	public boolean isFinished() {
-		return finished;
-	}
-	
-	public void setFinished(boolean finished) {
-		this.finished = finished;
 	}
 }

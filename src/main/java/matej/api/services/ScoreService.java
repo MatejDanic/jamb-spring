@@ -26,7 +26,7 @@ public class ScoreService {
 		Queue<Score> queue = new LinkedList<>();
 		LocalDate today = LocalDate.now();
 		for (Score score : scoreRepo.findAll()) {
-			if (!score.isFinished() && score.getDate().isBefore(today)) {
+			if (score.getDate().isBefore(today)) {
 				queue.add(score);
 			}
 		}
@@ -38,7 +38,7 @@ public class ScoreService {
 		Queue<Score> queue = new LinkedList<>();
 		LocalDate today = LocalDate.now();
 		leaderBoard.forEach(e -> {
-			if (!e.isFinished() || !(DateUtil.isSameWeek(e.getDate(), today))) {
+			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
 				queue.add(e);
 			}
 		});
