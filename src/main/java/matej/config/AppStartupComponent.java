@@ -1,4 +1,4 @@
-package matej.startup;
+package matej.config;
 
 import java.util.Arrays;
 
