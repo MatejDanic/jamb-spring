@@ -33,6 +33,7 @@ public class JambFactory {
 	public static Score createScore(User user, int finalSum) {
 		Score score = new Score();
 		score.setUser(user);
+		score.setUsername(user.getUsername());
 		score.setValue(finalSum);
 		score.setDate(LocalDate.now());
 		return score;
