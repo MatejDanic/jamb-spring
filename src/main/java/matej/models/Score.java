@@ -23,8 +23,11 @@ public class Score {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonIgnore
-	@JoinColumn(name = "user_id", nullable = false)
+	@JoinColumn(name = "username", nullable = false)
 	private User user;
+
+	@javax.persistence.Column(name = "username", nullable = false)
+	private String username;
 	
 	@javax.persistence.Column(name = "value", nullable = false)
 	private int value;
@@ -46,6 +49,7 @@ public class Score {
 	
 	public void setUser(User user) {
 		this.user = user;
+		this.username = user.getUsername();
 	}
 	
 	public int getValue() {
