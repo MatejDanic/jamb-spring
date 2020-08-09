@@ -26,7 +26,7 @@ public class Score {
 	@JoinColumn(name = "user", nullable = false)
 	private User user;
 
-	@javax.persistence.Column(name = "username", nullable = true)
+	@javax.persistence.Column(name = "username", nullable = false)
 	private String username;
 	
 	@javax.persistence.Column(name = "value", nullable = false)
