@@ -24,14 +24,14 @@ public class ScoreService {
 
 	public List<Score> getLeaderboard(int max) {
 		List<Score> leaderBoard = scoreRepo.findAll();
-		Queue<Score> queue = new LinkedList<>();
-		LocalDate today = LocalDate.now();
-		leaderBoard.forEach(e -> {
-			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
-				queue.add(e);
-			}
-		});
-		leaderBoard.removeAll(queue);
+		// Queue<Score> queue = new LinkedList<>();
+		// LocalDate today = LocalDate.now();
+		// leaderBoard.forEach(e -> {
+		// 	if (!(DateUtil.isSameWeek(e.getDate(), today))) {
+		// 		queue.add(e);
+		// 	}
+		// });
+		// leaderBoard.removeAll(queue);
 		Collections.sort(leaderBoard, new Comparator<Score>() {
 			@Override
 			public int compare(Score s1, Score s2) {
