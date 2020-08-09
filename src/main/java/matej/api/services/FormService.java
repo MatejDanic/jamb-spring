@@ -151,7 +151,7 @@ public class FormService {
 		if (form.getRollCount() >= 2)
 			throw new IllegalMoveException("Announcement unavailable after second roll!");
 
-		form.setAnnouncement(BoxType.fromOrdinal(announcementOrdinal));
+		form.setAnnouncement(announcementOrdinal);
 		formRepo.save(form);
 		return announcementOrdinal;
 	}
@@ -169,9 +169,9 @@ public class FormService {
 			throw new IllegalMoveException("Box already filled!");
 		else if (form.getRollCount() == 0)
 			throw new IllegalMoveException("Cannot fill box without rolling dice!");
-		else if (!box.isAvailable() && form.getAnnouncement() == null)
+		else if (!box.isAvailable() && BoxType.fromOrdinal(form.getAnnouncement()) == null)
 			throw new IllegalMoveException("Box is currently not available!");
-		else if (form.getAnnouncement() != null && form.getAnnouncement() != box.getBoxType())
+		else if (form.getAnnouncement() != null && BoxType.fromOrdinal(form.getAnnouncement()) != box.getBoxType())
 			throw new IllegalMoveException("Box is not the same as announcement!");
 
 		box.fill(form.getDice());

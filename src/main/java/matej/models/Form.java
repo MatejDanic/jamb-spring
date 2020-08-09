@@ -16,7 +16,6 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import matej.models.enums.BoxType;
 import matej.models.enums.ColumnType;
 
 
@@ -43,7 +42,7 @@ public class Form {
 	private int rollCount;
 	
 	@javax.persistence.Column(name = "announcement", nullable = true)
-	private BoxType announcement;
+	private Integer announcement;
 
 	@javax.persistence.Column(name = "announcement_required", nullable = false)
 	private boolean announcementRequired;
@@ -90,11 +89,11 @@ public class Form {
 		this.rollCount = rollCount;
 	}
 
-	public BoxType getAnnouncement() {
+	public Integer getAnnouncement() {
 		return announcement;
 	}
 
-	public void setAnnouncement(BoxType announcement) {
+	public void setAnnouncement(Integer announcement) {
 		this.announcement = announcement;
 	}
 	
