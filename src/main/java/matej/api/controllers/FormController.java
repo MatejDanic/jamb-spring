@@ -47,8 +47,7 @@ public class FormController {
 
 	@PutMapping("")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
-		if (!rateLimiter.tryAcquire(1))
-			return null;
+		// if (!rateLimiter.tryAcquire(1)) return null;
 		try {
 			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)),
 					HttpStatus.OK);
