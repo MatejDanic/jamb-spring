@@ -3,9 +3,12 @@ package matej.api.controllers;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.util.concurrent.RateLimiter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,10 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-// import javassist.NotFoundException;
-
-// import com.google.common.util.concurrent.RateLimiter;
 
 import matej.api.services.FormService;
 import matej.exceptions.IllegalMoveException;
@@ -33,7 +32,8 @@ import matej.models.enums.ColumnType;
 import matej.security.jwt.JwtUtils;
 
 @RestController
-@CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
+@CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/forms")
 public class FormController {
 
@@ -43,62 +43,112 @@ public class FormController {
 	@Autowired
 	JwtUtils jwtUtils;
 
-	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
-
-	// public String getUsername(@RequestHeader(value="Authorization") String
-	// headerAuth) {
-	// return jwtUtils.getUsernameFromHeader(headerAuth);
-	// }
+	private final RateLimiter rateLimiter = RateLimiter.create(0.2);
 
 	@PutMapping("")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
-		// if (!rateLimiter.tryAcquire(1)) return null;
+		if (!rateLimiter.tryAcquire(1))
+			return null;
 		try {
-			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)), HttpStatus.OK);
+			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)),
+					HttpStatus.OK);
+		} catch (UsernameNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping("/{id}/roll")
+	public ResponseEntity<Object> rollDice(@RequestHeader(value = "Authorization") String headerAuth,
+			@PathVariable(value = "id") int id, @RequestBody Map<Integer, Boolean> diceToThrow) {
+		try {
+			return new ResponseEntity<>(
+					formService.rollDice(jwtUtils.getUsernameFromHeader(headerAuth), id, diceToThrow), HttpStatus.OK);
+		} catch (InvalidOwnershipException | IllegalMoveException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping("/{id}/announce")
+	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth,
+			@PathVariable(value = "id") int id, @RequestBody int announcementOrdinal) {
+		try {
+			return new ResponseEntity<>(
+					formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, announcementOrdinal),
+					HttpStatus.OK);
+		} catch (IllegalMoveException | InvalidOwnershipException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping("/{id}/columns/{columnTypeOrdinal}/boxes/{boxTypeOrdinal}/fill")
+	public ResponseEntity<Object> fillBox(@RequestHeader(value = "Authorization") String headerAuth,
+			@PathVariable(value = "id") int id, @PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal,
+			@PathVariable(value = "boxTypeOrdinal") int boxTypeOrdinal) {
+		try {
+			return new ResponseEntity<>(formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id,
+					columnTypeOrdinal, boxTypeOrdinal), HttpStatus.OK);
+		} catch (IllegalMoveException | InvalidOwnershipException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/{id}/sums")
+	public ResponseEntity<Object> getSums(@RequestHeader(value = "Authorization") String headerAuth,
+			@PathVariable(value = "id") int id) throws InvalidOwnershipException {
+		try {
+			return new ResponseEntity<>(formService.getSums(jwtUtils.getUsernameFromHeader(headerAuth), id),
+					HttpStatus.OK);
 		} catch (UsernameNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id)
-			throws InvalidOwnershipException {
+	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth,
+			@PathVariable(value = "id") int id) throws InvalidOwnershipException {
 		try {
-			return new ResponseEntity<>(formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id), HttpStatus.OK);
+			formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (UsernameNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@GetMapping("")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<Form> getFormList() {
 		return formService.getFormList();
 	}
 
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public Form getFormById(@PathVariable(value = "id") int id) {
 		return formService.getFormById(id);
 	}
 
 	@GetMapping("/{id}/columns")
-	public List<Column> getColumns(@PathVariable(value = "id") int id) {
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public List<Column> getFormColumns(@PathVariable(value = "id") int id) {
 		return formService.getFormById(id).getColumns();
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeOrdinal}")
-	public Column getColumnByType(@PathVariable(value = "id") int id,
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public Column getFormColumnByType(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal) {
 		return formService.getFormById(id).getColumnByType(ColumnType.values()[columnTypeOrdinal]);
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeOrdinal}/boxes")
-	public List<Box> getColumnBoxes(@PathVariable(value = "id") int id,
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public List<Box> getFormColumnBoxes(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal) {
 		return formService.getFormById(id).getColumnByType(ColumnType.values()[columnTypeOrdinal]).getBoxes();
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeOrdinal}/boxes/{boxTypeOrdinal}")
-	public Box getColumnBoxByType(@PathVariable(value = "id") int id,
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public Box getFormColumnBoxBoxByType(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal,
 			@PathVariable(value = "boxTypeOrdinal") int boxTypeOrdinal) {
 		return formService.getFormById(id).getColumnByType(ColumnType.values()[columnTypeOrdinal])
@@ -106,48 +156,8 @@ public class FormController {
 	}
 
 	@GetMapping("/{id}/dice")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<Dice> getFormDice(@PathVariable(value = "id") int id) {
 		return formService.getFormById(id).getDice();
 	}
-
-	@PutMapping("/{id}/roll")
-	public ResponseEntity<Object> rollDice(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id,
-			@RequestBody Map<Integer, Boolean> diceToThrow) {
-		try {
-			return new ResponseEntity<>(formService.rollDice(jwtUtils.getUsernameFromHeader(headerAuth), id, diceToThrow), HttpStatus.OK);
-		} catch (InvalidOwnershipException | IllegalMoveException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@PutMapping("/{id}/announce")
-	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id, @RequestBody int announcementOrdinal) {
-		try {
-			return new ResponseEntity<>(formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, announcementOrdinal), HttpStatus.OK);
-		} catch (IllegalMoveException | InvalidOwnershipException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@PutMapping("/{id}/columns/{columnTypeOrdinal}/boxes/{boxTypeOrdinal}/fill")
-	public ResponseEntity<Object> fillBox(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id,
-			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal,
-			@PathVariable(value = "boxTypeOrdinal") int boxTypeOrdinal) {
-		try {
-			return new ResponseEntity<>(formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id, columnTypeOrdinal, boxTypeOrdinal), HttpStatus.OK);
-		} catch (IllegalMoveException | InvalidOwnershipException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@GetMapping("/{id}/sums")
-	public ResponseEntity<Object> getSums(@RequestHeader(value = "Authorization") String headerAuth, @PathVariable(value = "id") int id)
-			throws InvalidOwnershipException {
-		try {
-			return new ResponseEntity<>(formService.getSums(jwtUtils.getUsernameFromHeader(headerAuth), id), HttpStatus.OK);
-		} catch (UsernameNotFoundException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-
 }

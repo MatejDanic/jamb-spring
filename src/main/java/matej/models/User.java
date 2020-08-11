@@ -1,5 +1,6 @@
 package matej.models;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -17,30 +18,28 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(	name = "auth_user")
+@Table(name = "auth_user")
 public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToMany(mappedBy="user", cascade = CascadeType.ALL)
-    private Set<Score> scores;
+    @OneToMany(mappedBy="user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
+    private List<Score> scores;
 
     @OneToOne(mappedBy="user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private Form form;
     
     @javax.persistence.Column(name="username", nullable=false, unique=true)
-    @Size(max = 15)
+    @Size(min = 3, max = 15)
     private String username;
     
     @javax.persistence.Column(name="password", nullable=false)
     private String password;
     
     @ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
-    @JoinTable(	name = "auth_user_role", 
-				joinColumns = @JoinColumn(name = "user_id"), 
-                inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "auth_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
     public User() {
@@ -59,11 +58,11 @@ public class User {
         this.id = id;
     }
     
-    public Set<Score> getScores() {
+    public List<Score> getScores() {
         return scores;
     }
 
-    public void setScores(Set<Score> scores) {
+    public void setScores(List<Score> scores) {
         this.scores = scores;
     }
 

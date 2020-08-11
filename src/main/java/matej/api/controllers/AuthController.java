@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.google.common.util.concurrent.RateLimiter;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -50,6 +52,8 @@ public class AuthController {
 	
 	@Autowired
 	JwtUtils jwtUtils;
+
+	private final RateLimiter rateLimiter = RateLimiter.create(0.2);
 	
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -73,6 +77,8 @@ public class AuthController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+		if (!rateLimiter.tryAcquire(1)) return null;
+
 		if (userRepo.existsByUsername(registerRequest.getUsername())) {
 			return ResponseEntity
 			.badRequest()

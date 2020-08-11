@@ -21,7 +21,6 @@ public class Role {
     private String description;
 
     public Role() {
-        
     }
 
     public Role(String label) {

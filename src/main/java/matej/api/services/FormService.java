@@ -2,7 +2,6 @@ package matej.api.services;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -48,50 +47,32 @@ public class FormService {
 	@Autowired
 	UserRepository userRepo;
 
-	public Optional<Form> initializeForm(String username) throws UsernameNotFoundException {
+	public Form initializeForm(String username) throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		if (user.getForm() != null) {
-			return formRepo.findById(user.getForm().getId());
+			return formRepo.getOne(user.getForm().getId());
 		} else {
 			System.out.println("Creating new form...");
 			Form form = JambFactory.createForm(user);
 			user.setForm(form);
 			userRepo.save(user);
-			return formRepo.findById(user.getForm().getId());
+			return formRepo.getOne(user.getForm().getId());
 		}
 	}
 
-	public boolean deleteFormById(String username, int id) throws InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
-		return deleteForm(formRepo.getOne(id));
+	public void deleteFormById(String username, int id) throws InvalidOwnershipException {
+		formRepo.deleteById(id);
 	}
 
-	public boolean deleteForm(Form form, User user, int finalSum) {
-		try {
-			Score score = JambFactory.createScore(user, finalSum);
-			scoreRepo.save(score);
-			formRepo.delete(form);
-			return true;
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		return false;
-	}
-
-	public boolean deleteForm(Form form) {
-		try {
-			formRepo.delete(form);
-			return true;
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		return false;
+	public void deleteFormSaveScore(Form form, User user, int finalSum) {
+		Score score = JambFactory.createScore(user, finalSum);
+		scoreRepo.save(score);
+		formRepo.delete(form);
 	}
 
 	public Form getFormById(int id) {
-		return formRepo.findById(id).get();
+		return formRepo.getOne(id);
 	}
 
 	public Column getColumn(int id, int columnTypeOrdinal) {
@@ -158,9 +139,11 @@ public class FormService {
 
 	public Map<String, Integer> fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
 			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
-		
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+
+		User user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		Form form = getFormById(id);
 		Column column = form.getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
 		Box box = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
@@ -186,8 +169,7 @@ public class FormService {
 		sums.put("boxValue", box.getValue());
 
 		if (isFormCompleted(form)) {
-			// System.out.println("Deleting form...");
-			deleteForm(form, user, sums.get("finalSum"));
+			deleteFormSaveScore(form, user, sums.get("finalSum"));
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
@@ -198,7 +180,8 @@ public class FormService {
 	}
 
 	public Map<String, Integer> getSums(String username, int id) throws InvalidOwnershipException {
-		if (!checkOwnership(username, id)) throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
 		Form form = getFormById(id);
 		return form.calculateSums();
 	}
@@ -227,13 +210,12 @@ public class FormService {
 			nextBox.setColumn(column);
 			boxRepo.save(nextBox);
 		} catch (IndexOutOfBoundsException e) {
-			// e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
 	private boolean isAnnouncementRequired(Form form) {
 		boolean announcementRequired = (form.getAnnouncement() == null);
-		// System.out.println(form);
 		for (Column column : form.getColumns()) {
 			if (column.getColumnType() != ColumnType.ANNOUNCEMENT) {
 				if (!column.isCompleted()) {

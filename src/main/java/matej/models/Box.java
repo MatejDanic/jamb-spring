@@ -20,8 +20,8 @@ import matej.utils.ScoreUtil;
 @IdClass(BoxId.class)
 public class Box {
 
-	@Id
 	@JsonIgnore
+	@Id
 	@ManyToOne
 	@JoinColumn(name = "column_id", referencedColumnName = "id", nullable = false)
 	private Column column;

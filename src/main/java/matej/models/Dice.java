@@ -18,8 +18,8 @@ import matej.models.composite.DiceId;
 @IdClass(DiceId.class)
 public class Dice {
 
-	@Id
 	@JsonIgnore
+	@Id
 	@ManyToOne
 	@JoinColumn(name = "form_id", referencedColumnName = "id", nullable = false)
 	private Form form;

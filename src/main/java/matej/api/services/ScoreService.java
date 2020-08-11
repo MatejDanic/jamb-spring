@@ -1,11 +1,11 @@
 package matej.api.services;
 
-// import java.time.LocalDate;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
-// import java.util.LinkedList;
+import java.util.LinkedList;
 import java.util.List;
-// import java.util.Queue;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import matej.api.repositories.ScoreRepository;
 import matej.models.Score;
-// import matej.utils.DateUtil;
+import matej.utils.DateUtil;
 
 
 @Service
@@ -22,16 +22,28 @@ public class ScoreService {
 	@Autowired
 	ScoreRepository scoreRepo;
 
-	public List<Score> getLeaderboard(int max) {
+	public List<Score> getScores() {
+		return scoreRepo.findAll();
+	}
+
+	public Score getScoreById(int id) {
+		return scoreRepo.getOne(id);
+	}
+
+	public void deleteScoreById(int id) {
+		scoreRepo.deleteById(id);
+	}
+
+	public List<Score> getScoreboard(int max) {
 		List<Score> leaderBoard = scoreRepo.findAll();
-		// Queue<Score> queue = new LinkedList<>();
-		// LocalDate today = LocalDate.now();
-		// leaderBoard.forEach(e -> {
-		// 	if (!(DateUtil.isSameWeek(e.getDate(), today))) {
-		// 		queue.add(e);
-		// 	}
-		// });
-		// leaderBoard.removeAll(queue);
+		Queue<Score> queue = new LinkedList<>();
+		LocalDate today = LocalDate.now();
+		leaderBoard.forEach(e -> {
+			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
+				queue.add(e);
+			}
+		});
+		leaderBoard.removeAll(queue);
 		Collections.sort(leaderBoard, new Comparator<Score>() {
 			@Override
 			public int compare(Score s1, Score s2) {
@@ -40,4 +52,6 @@ public class ScoreService {
 		});
 		return leaderBoard.stream().limit(max).collect(Collectors.toList());
 	}
+
+
 }
