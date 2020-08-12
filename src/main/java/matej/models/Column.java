@@ -91,6 +91,23 @@ public class Column {
 		return true;
 	}
 
+	public int calculateSum() {
+		int numberSum = 0;
+		int diffSum = 0;
+		int labelSum = 0;
+		boolean diffReady = true;
+		for (Box box : boxes) {
+			if (box.getBoxType() == BoxType.ONES || box.getBoxType() == BoxType.MAX || box.getBoxType() == BoxType.MIN) {
+				if (!box.isFilled()) diffReady = false;
+			}
+			if (box.getBoxType().ordinal() <= 5) numberSum += box.getValue();
+			else if (box.getBoxType().ordinal() >= 8) labelSum += box.getValue();
+		}
+		if (numberSum >= JambConstants.NUMBERSUM_BONUS_THRESHOLD) numberSum += JambConstants.NUMBERSUM_BONUS;
+		if (diffReady) diffSum = (getBoxByType(BoxType.MAX).getValue() - getBoxByType(BoxType.MIN).getValue()) * getBoxByType(BoxType.ONES).getValue();
+		return numberSum + diffSum + labelSum;
+	}
+
 	public Map<String, Integer> calculateSums() {
 		Map<String, Integer> sums = new HashMap<>();
 		sums.put("numberSum", 0);

@@ -44,9 +44,6 @@ public class Form {
 	@javax.persistence.Column(name = "announcement", nullable = true)
 	private Integer announcement;
 
-	@javax.persistence.Column(name = "announcement_required", nullable = false)
-	private boolean announcementRequired;
-
 	public int getId() {
 		return id;
 	}
@@ -117,8 +114,12 @@ public class Form {
 		return newDice;
 	}
 
-	public boolean isAnnouncementRequired() {
-		return announcementRequired;
+	public int calculateFinalSum() {
+		int finalSum = 0;
+		for (Column column : columns) {
+			finalSum += column.calculateSum();
+		}
+		return finalSum;
 	}
 
 	public Map<String, Integer> calculateSums() {
@@ -138,7 +139,16 @@ public class Form {
 		return sums;
 	}
 
-	public void setAnnouncementRequired(boolean announcementRequired) {
-		this.announcementRequired = announcementRequired;
+	public boolean isAnnouncementRequired() {
+		boolean announcementRequired = (announcement == null);
+		for (Column column : columns) {
+			if (column.getColumnType() != ColumnType.ANNOUNCEMENT) {
+				if (!column.isCompleted()) {
+					announcementRequired = false;
+					break;
+				}
+			}
+		}
+		return announcementRequired;
 	}
 }

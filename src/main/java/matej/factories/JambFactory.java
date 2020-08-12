@@ -18,7 +18,6 @@ public class JambFactory {
 
 	public static Form createForm(User user) {
 		Form form = new Form();
-		form.setAnnouncementRequired(false);
 		form.setColumns(createColumns(form));
 		for (Column column : form.getColumns()) {
 			column.setBoxes(createBoxes(column));

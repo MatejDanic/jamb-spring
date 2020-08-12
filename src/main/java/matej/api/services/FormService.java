@@ -98,13 +98,11 @@ public class FormService {
 			diceToThrow.replaceAll((k, v) -> v = true);
 		else if (form.getRollCount() == JambConstants.NUM_OF_ROLLS)
 			throw new IllegalMoveException("Dice roll limit reached!");
-		else if (form.getRollCount() > 0 && isAnnouncementRequired(form) && form.getAnnouncement() == null)
+		else if (form.getRollCount() > 0 && form.isAnnouncementRequired() && form.getAnnouncement() == null)
 			throw new IllegalMoveException("Announcement is required!");
 
 		if (form.getRollCount() < JambConstants.NUM_OF_ROLLS) {
 			form.setRollCount(form.getRollCount() + 1);
-			if (isAnnouncementRequired(form))
-				form.setAnnouncementRequired(true);
 			formRepo.save(form);
 		}
 
@@ -137,7 +135,7 @@ public class FormService {
 		return announcementOrdinal;
 	}
 
-	public Map<String, Integer> fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
+	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
 			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
@@ -165,18 +163,14 @@ public class FormService {
 		column.setForm(form);
 		columnRepo.save(column);
 
-		Map<String, Integer> sums = form.calculateSums();
-		sums.put("boxValue", box.getValue());
-
 		if (isFormCompleted(form)) {
-			deleteFormSaveScore(form, user, sums.get("finalSum"));
+			deleteFormSaveScore(form, user, form.calculateFinalSum());
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
 			formRepo.save(form);
 		}
-
-		return sums;
+		return box.getValue();
 	}
 
 	public Map<String, Integer> getSums(String username, int id) throws InvalidOwnershipException {
@@ -212,19 +206,6 @@ public class FormService {
 		} catch (IndexOutOfBoundsException e) {
 			System.out.println(e.getMessage());
 		}
-	}
-
-	private boolean isAnnouncementRequired(Form form) {
-		boolean announcementRequired = (form.getAnnouncement() == null);
-		for (Column column : form.getColumns()) {
-			if (column.getColumnType() != ColumnType.ANNOUNCEMENT) {
-				if (!column.isCompleted()) {
-					announcementRequired = false;
-					break;
-				}
-			}
-		}
-		return announcementRequired;
 	}
 
 	private boolean checkOwnership(String username, int formId) {
