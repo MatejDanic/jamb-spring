@@ -3,7 +3,7 @@ package matej.api.controllers;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.util.concurrent.RateLimiter;
+// import com.google.common.util.concurrent.RateLimiter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,7 +43,7 @@ public class FormController {
 	@Autowired
 	JwtUtils jwtUtils;
 
-	private final RateLimiter rateLimiter = RateLimiter.create(0.2);
+	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
 
 	@PutMapping("")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
