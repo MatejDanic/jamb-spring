@@ -80,7 +80,7 @@ public class Box {
 	}
 
 	public int fill(List<Dice> diceList) {
-		value = ScoreUtil.checkScore(diceList, boxType);
+		value = ScoreUtil.calculateScore(diceList, boxType);
 		filled = true;
 		available = false;
 		return value;
