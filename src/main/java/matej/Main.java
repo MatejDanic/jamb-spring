@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
-* Implementation of the Croatian edition of the dice game Yahtzee (Jamb).
+* Online implementation of the Croatian edition of the dice game Yahtzee, locally known as Jamb.
 *
 * @author  MatejDanic
 * @version 1.0

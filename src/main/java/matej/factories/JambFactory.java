@@ -14,15 +14,29 @@ import matej.models.User;
 import matej.models.enums.BoxType;
 import matej.models.enums.ColumnType;
 
+/*
+ * This factory class contains methods for instantiating various objects of Jamb.
+ *
+ * @author MatejDanic
+ * @version 1.0
+ * @since 2020-08-16
+ */
 public class JambFactory {
 
+	/**
+	 * This method starts the initialization process by creating the game form
+	 * 
+	 * @param user	the owner of the form
+	 * 
+	 * @return {@code Form} the created form object
+	 */
 	public static Form createForm(User user) {
 		Form form = new Form();
-		form.setColumns(createColumns(form));
+		form.setColumns(createColumns(form)); // create columns of the form
 		for (Column column : form.getColumns()) {
-			column.setBoxes(createBoxes(column));
+			column.setBoxes(createBoxes(column)); // for each column create its boxes
 		}
-		form.setDice(createDice(form));
+		form.setDice(createDice(form)); // create dice to roll for the form
 		form.setRollCount(0);
 		form.setAnnouncement(null);
 		form.setUser(user);
