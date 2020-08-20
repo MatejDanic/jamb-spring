@@ -9,6 +9,13 @@ import matej.api.repositories.UserRepository;
 import matej.models.Score;
 import matej.models.User;
 
+/**
+ * Service Class for managing {@link User} repostiory
+ *
+ * @author MatejDanic
+ * @version 1.0
+ * @since 2020-08-20
+ */
 @Service
 public class UserService {
 

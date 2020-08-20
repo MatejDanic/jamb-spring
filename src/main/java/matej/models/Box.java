@@ -1,7 +1,6 @@
 package matej.models;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

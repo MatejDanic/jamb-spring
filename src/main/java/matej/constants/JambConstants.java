@@ -1,5 +1,12 @@
 package matej.constants;
 
+/**
+ * Class containing all constants for the game.
+ *
+ * @author MatejDanic
+ * @version 1.0
+ * @since 2020-08-20
+ */
 public class JambConstants {
 	
 	public static final int NUM_OF_DICE = 5;

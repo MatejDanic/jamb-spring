@@ -26,8 +26,8 @@ public class Score {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@javax.persistence.Column(name = "username", nullable = false)
-	private String username;
+	// @javax.persistence.Column(name = "username", nullable = false)
+	// private String username;
 	
 	@javax.persistence.Column(name = "value", nullable = false)
 	private int value;
@@ -67,11 +67,11 @@ public class Score {
 		this.date = date;
 	}
 
-	public String getUsername() {
-		return username;
-	}
+	// public String getUsername() {
+	// 	return username;
+	// }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+	// public void setUsername(String username) {
+	// 	this.username = username;
+	// }
 }

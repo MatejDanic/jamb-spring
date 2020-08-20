@@ -26,6 +26,13 @@ import matej.models.User;
 import matej.models.enums.BoxType;
 import matej.models.enums.ColumnType;
 
+/**
+ * Service Class for managing {@link Form} repostiory
+ *
+ * @author MatejDanic
+ * @version 1.0
+ * @since 2020-08-20
+ */
 @Service
 public class FormService {
 
@@ -47,13 +54,20 @@ public class FormService {
 	@Autowired
 	UserRepository userRepo;
 
+	/**
+	 * Creates or retrieves existing {@link Form} Object for the current {@link User}.
+	 * 
+	 * @param username      the username of the current user
+	 * 
+	 * @return {@link Form} the form that the game will be played on
+	 * 
+	 * @throws UsernameNotFoundException if user with given username does not exist
+	 */
 	public Form initializeForm(String username) throws UsernameNotFoundException {
-		User user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		if (user.getForm() != null) {
 			return formRepo.getOne(user.getForm().getId());
 		} else {
-			System.out.println("Creating new form...");
 			Form form = JambFactory.createForm(user);
 			user.setForm(form);
 			userRepo.save(user);
@@ -61,6 +75,15 @@ public class FormService {
 		}
 	}
 
+	/**
+	 * Deletes {@link Form} object from database repository.
+	 * 
+	 * @param username the username of the form owner
+	 * 
+	 * @return {@link Form} the form that the game will be played on
+	 * 
+	 * @throws UsernameNotFoundException if user with given username does not exist
+	 */
 	public void deleteFormById(String username, int id) throws InvalidOwnershipException {
 		formRepo.deleteById(id);
 	}

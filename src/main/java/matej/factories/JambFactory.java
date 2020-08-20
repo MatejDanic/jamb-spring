@@ -26,9 +26,9 @@ public class JambFactory {
 	/**
 	 * This method starts the initialization process by creating the game form
 	 * 
-	 * @param user	the owner of the form
+	 * @param user the owner of the form
 	 * 
-	 * @return {@code Form} the created form object
+	 * @return {@link Form} the created form object
 	 */
 	public static Form createForm(User user) {
 		Form form = new Form();
@@ -46,7 +46,7 @@ public class JambFactory {
 	public static Score createScore(User user, int finalSum) {
 		Score score = new Score();
 		score.setUser(user);
-		score.setUsername(user.getUsername());
+		// score.setUsername(user.getUsername());
 		score.setValue(finalSum);
 		score.setDate(LocalDate.now());
 		return score;

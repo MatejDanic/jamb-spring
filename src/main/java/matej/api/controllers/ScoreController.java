@@ -1,6 +1,7 @@
 package matej.api.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,8 +41,13 @@ public class ScoreController {
 		scoreService.deleteScoreById(id);
 	}
 	
-	@GetMapping("/board")
-	public List<Score> getScoreboard() {
+	@GetMapping("/scoreboard")
+	public List<Map<String, String>> getScoreboard() {
 		return scoreService.getScoreboard(JambConstants.LEADERBOARD_LIMIT);
-    }
+	}
+	
+	@GetMapping("/leader")
+	public String getCurrentWeekWinner() {
+		return scoreService.getCurrentWeekWinner();
+	}
 }
