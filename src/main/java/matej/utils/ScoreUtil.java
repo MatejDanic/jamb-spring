@@ -110,7 +110,7 @@ public final class ScoreUtil {
 		for (int i = 1; i <= 6; i++) {
 			int count = Collections.frequency(diceValues, i);
 			if (count >= repeatNumber) { // if count has reached given number return sum increased by given bonus
-				return i * count + bonus;
+				return i * repeatNumber + bonus; // multiply by repeat number instead of count
 			}
 		}
 		return 0; // if count has not reached given number for any dice value return 0
