@@ -14,7 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import matej.models.enums.ColumnType;
 
@@ -27,14 +27,15 @@ public class Form {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@JsonIgnore
 	@OneToOne
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
+	@JsonIgnoreProperties("form")
 	@OneToMany(mappedBy ="form", cascade = CascadeType.ALL)
 	private List<Column> columns;
 
+	@JsonIgnoreProperties("form")
 	@OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
     private List<Dice> dice;
 

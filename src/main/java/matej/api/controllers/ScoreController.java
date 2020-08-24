@@ -47,7 +47,7 @@ public class ScoreController {
 	}
 	
 	@GetMapping("/leader")
-	public String getCurrentWeekWinner() {
-		return scoreService.getCurrentWeekWinner();
+	public String getCurrentWeekLeader() {
+		return scoreService.getCurrentWeekLeader();
 	}
 }

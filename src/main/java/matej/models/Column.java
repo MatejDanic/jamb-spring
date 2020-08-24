@@ -15,7 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import matej.constants.JambConstants;
 import matej.models.enums.BoxType;
@@ -29,7 +29,6 @@ public class Column {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "form_id", referencedColumnName = "id", nullable = false)
 	private Form form;
@@ -37,6 +36,7 @@ public class Column {
 	@javax.persistence.Column(name = "type", nullable = false)
 	private ColumnType columnType;
 
+	@JsonIgnoreProperties("column")
 	@OneToMany(mappedBy = "column", cascade = CascadeType.ALL)
 	private List<Box> boxes;
 

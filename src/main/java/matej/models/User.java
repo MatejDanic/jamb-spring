@@ -17,6 +17,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name = "auth_user")
 public class User {
@@ -25,9 +27,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @JsonIgnoreProperties("user")
     @OneToMany(mappedBy="user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private List<Score> scores;
 
+    @JsonIgnoreProperties("user")
     @OneToOne(mappedBy="user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private Form form;
     

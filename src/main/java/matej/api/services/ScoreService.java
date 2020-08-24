@@ -39,7 +39,7 @@ public class ScoreService {
 	}
 
 	public Score getScoreById(int id) {
-		return scoreRepo.getOne(id);
+		return scoreRepo.findById(id).get();
 	}
 
 	public void deleteScoreById(int id) {
@@ -60,14 +60,18 @@ public class ScoreService {
 		return scoreboard;
 	}
 
-	public String getCurrentWeekWinner() {
+	public String getCurrentWeekLeader() {
+		String leader = "";
 		List<Score> scores = getCurrentWeekScores();
-		return scores.get(0).getUser().getUsername();
+		if (scores.size() > 0) leader = scores.get(0).getUser().getUsername();
+		return leader;
 	}
 
-	public String getLastWeekWinner() {
+	public String getLastWeekLeader() {
+		String leader = "";
 		List<Score> scores = getLastWeekScores();
-		return scores.get(0).getUser().getUsername();
+		if (scores.size() > 0) leader = scores.get(0).getUser().getUsername();
+		return leader;
 	}
 
 

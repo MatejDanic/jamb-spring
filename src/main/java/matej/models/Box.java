@@ -9,8 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import matej.models.composite.BoxId;
 import matej.models.enums.BoxType;
 import matej.utils.ScoreUtil;
@@ -20,7 +18,6 @@ import matej.utils.ScoreUtil;
 @IdClass(BoxId.class)
 public class Box {
 
-	@JsonIgnore
 	@Id
 	@ManyToOne
 	@JoinColumn(name = "column_id", referencedColumnName = "id", nullable = false)

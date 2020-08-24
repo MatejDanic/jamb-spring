@@ -66,12 +66,12 @@ public class FormService {
 	public Form initializeForm(String username) throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		if (user.getForm() != null) {
-			return formRepo.getOne(user.getForm().getId());
+			return formRepo.findById(user.getForm().getId()).get();
 		} else {
 			Form form = JambFactory.createForm(user);
 			user.setForm(form);
 			userRepo.save(user);
-			return formRepo.getOne(user.getForm().getId());
+			return formRepo.findById(user.getForm().getId()).get();
 		}
 	}
 
@@ -95,7 +95,7 @@ public class FormService {
 	}
 
 	public Form getFormById(int id) {
-		return formRepo.getOne(id);
+		return formRepo.findById(id).get();
 	}
 
 	public Column getColumn(int id, int columnTypeOrdinal) {

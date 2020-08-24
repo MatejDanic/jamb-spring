@@ -31,10 +31,10 @@ public class UserService {
     }
 
     public User getUserById(int id) {
-        return userRepo.getOne(id);
+        return userRepo.findById(id).get();
     }
 
     public List<Score> getUserScores(int id) {
-        return userRepo.getOne(id).getScores();
+        return userRepo.findById(id).get().getScores();
     }
 }
