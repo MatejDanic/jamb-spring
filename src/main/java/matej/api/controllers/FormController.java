@@ -91,17 +91,6 @@ public class FormController {
 		}
 	}
 
-	@GetMapping("/{id}/sums")
-	public ResponseEntity<Object> getSums(@RequestHeader(value = "Authorization") String headerAuth,
-			@PathVariable(value = "id") int id) throws InvalidOwnershipException {
-		try {
-			return new ResponseEntity<>(formService.getSums(jwtUtils.getUsernameFromHeader(headerAuth), id),
-					HttpStatus.OK);
-		} catch (UsernameNotFoundException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-		}
-	}
-
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id) throws InvalidOwnershipException {
