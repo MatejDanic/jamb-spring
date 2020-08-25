@@ -32,7 +32,7 @@ import matej.models.enums.ColumnType;
 import matej.security.jwt.JwtUtils;
 
 @RestController
-@CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
+@CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
 @PreAuthorize("isAuthenticated()")
 @RequestMapping("/forms")
 public class FormController {
