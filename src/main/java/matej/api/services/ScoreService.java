@@ -1,6 +1,6 @@
 package matej.api.services;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -78,7 +78,7 @@ public class ScoreService {
 	private List<Score> getCurrentWeekScores() {
 		List<Score> currentWeekScores = scoreRepo.findAll();
 		Queue<Score> queue = new LinkedList<>();
-		LocalDate today = LocalDate.now();
+		LocalDateTime today = LocalDateTime.now();
 		currentWeekScores.forEach(e -> {
 			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
 				queue.add(e);
@@ -97,7 +97,7 @@ public class ScoreService {
 	private List<Score> getLastWeekScores() {
 		List<Score> currentWeekScores = scoreRepo.findAll();
 		Queue<Score> queue = new LinkedList<>();
-		LocalDate today = LocalDate.now();
+		LocalDateTime today = LocalDateTime.now();
 		currentWeekScores.forEach(e -> {
 			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
 				queue.add(e);

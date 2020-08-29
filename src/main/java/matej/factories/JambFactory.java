@@ -1,6 +1,6 @@
 package matej.factories;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +48,7 @@ public class JambFactory {
 		score.setUser(user);
 		// score.setUsername(user.getUsername());
 		score.setValue(finalSum);
-		score.setDate(LocalDate.now());
+		score.setDate(LocalDateTime.now());
 		return score;
 	}
 

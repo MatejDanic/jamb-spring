@@ -1,6 +1,6 @@
 package matej.models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,7 +26,7 @@ public class Score {
 	private int value;
 	
 	@javax.persistence.Column(name = "date", nullable = false)
-	private LocalDate date;
+	private LocalDateTime date;
 
 	public int getId() {
 		return id;
@@ -52,11 +52,11 @@ public class Score {
 		this.value = value;
 	}
 	
-	public LocalDate getDate() {
+	public LocalDateTime getDate() {
 		return date;
 	}
 	
-	public void setDate(LocalDate date) {
+	public void setDate(LocalDateTime date) {
 		this.date = date;
 	}
 }
