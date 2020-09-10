@@ -2,6 +2,7 @@ package matej.models;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -22,8 +23,8 @@ public class Dice {
 	private Form form;
 	
 	@Id
-	@javax.persistence.Column(name = "ordinal_number")
-	private int label;
+	@Column(name = "ordinal_number")
+	private int ordinalNumber;
 
 	@javax.persistence.Column(name = "value")
 	private int value;
@@ -44,12 +45,12 @@ public class Dice {
 		this.value = value;
 	}
 	
-	public int getLabel() {
-		return label;
+	public int getOrdinalNumber() {
+		return ordinalNumber;
 	}
 
-	public void setLabel(int label) {
-		this.label = label;
+	public void setOrdinalNumber(int ordinalNumber) {
+		this.ordinalNumber = ordinalNumber;
 	}
 
 	public void roll() {
@@ -58,7 +59,7 @@ public class Dice {
 	
 	@Override
 	public String toString() {
-		return form.getId() + " Dice #" + label + ": " + value;
+		return form.getId() + " Dice #" + ordinalNumber + ": " + value;
 	}
 	
 }

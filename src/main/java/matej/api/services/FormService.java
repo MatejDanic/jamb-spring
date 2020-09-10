@@ -69,9 +69,8 @@ public class FormService {
 			return formRepo.findById(user.getForm().getId()).get();
 		} else {
 			Form form = JambFactory.createForm(user);
-			user.setForm(form);
-			userRepo.save(user);
-			return formRepo.findById(user.getForm().getId()).get();
+			System.out.println(form);
+			return formRepo.save(form);
 		}
 	}
 
@@ -126,18 +125,17 @@ public class FormService {
 
 		if (form.getRollCount() < JambConstants.NUM_OF_ROLLS) {
 			form.setRollCount(form.getRollCount() + 1);
-			formRepo.save(form);
+			
 		}
-
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
 			Dice dice = form.getDiceByOrdinalNumber(entry.getKey());
 			if (entry.getValue()) {
 				dice.setForm(form);
-				dice.setLabel(entry.getKey());
+				dice.setOrdinalNumber(entry.getKey());
 				dice.roll();
-				diceRepo.save(dice);
 			}
 		}
+		formRepo.save(form);
 		return form.getDice();
 	}
 
@@ -180,19 +178,17 @@ public class FormService {
 
 		box.fill(form.getDice());
 		box.setColumn(column);
-		boxRepo.save(box);
 
 		advanceColumn(form, columnTypeOrdinal, boxTypeOrdinal);
 		column.setForm(form);
-		columnRepo.save(column);
 
 		if (isFormCompleted(form)) {
 			deleteFormSaveScore(form, user, form.calculateFinalSum());
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
-			formRepo.save(form);
 		}
+		formRepo.save(form);
 		return box.getValue();
 	}
 

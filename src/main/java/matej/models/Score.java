@@ -2,6 +2,7 @@ package matej.models;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,10 +23,10 @@ public class Score {
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
-	@javax.persistence.Column(name = "value", nullable = false)
+	@Column(name = "value", nullable = false)
 	private int value;
 	
-	@javax.persistence.Column(name = "date", nullable = false)
+	@Column(name = "date", nullable = false)
 	private LocalDateTime date;
 
 	public int getId() {

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -14,19 +15,20 @@ import matej.models.enums.BoxType;
 import matej.utils.ScoreUtil;
 
 @Entity
-@Table(name="box")
+@Table(name = "box")
 @IdClass(BoxId.class)
 public class Box {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "column_id", referencedColumnName = "id", nullable = false)
+	@JoinColumns({@JoinColumn(name = "form_id", referencedColumnName = "form_id", nullable = false),
+				  @JoinColumn(name = "column_type", referencedColumnName = "column_type", nullable = false) })
 	private Column column;
-	
+
 	@Id
-	@javax.persistence.Column(name = "type")
+	@javax.persistence.Column(name = "box_type")
 	private BoxType boxType;
-	
+
 	@javax.persistence.Column(name = "value")
 	private int value;
 
@@ -43,11 +45,11 @@ public class Box {
 	public void setColumn(Column column) {
 		this.column = column;
 	}
-	
+
 	public BoxType getBoxType() {
 		return boxType;
 	}
-	
+
 	public void setBoxType(BoxType boxType) {
 		this.boxType = boxType;
 	}
@@ -67,7 +69,7 @@ public class Box {
 	public void setFilled(boolean filled) {
 		this.filled = filled;
 	}
-	
+
 	public boolean isAvailable() {
 		return available;
 	}
@@ -82,5 +84,5 @@ public class Box {
 		available = false;
 		return value;
 	}
-	
+
 }

@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import matej.models.Form;
+import matej.models.enums.ColumnType;
 
-public class DiceId implements Serializable {
+public class ColumnId implements Serializable {
 
 	/**
 	 * 
@@ -14,13 +15,13 @@ public class DiceId implements Serializable {
 
 	private Form form;
 	
-	private int ordinalNumber;
+	private ColumnType columnType;
 	
-	public DiceId() {}
+	public ColumnId() {}
  
-    public DiceId(Form form, int ordinalNumber) {
+    public ColumnId(Form form, ColumnType columnType) {
         this.form = form;
-        this.ordinalNumber = ordinalNumber;
+        this.columnType = columnType;
     }
     
     @Override
@@ -28,14 +29,14 @@ public class DiceId implements Serializable {
         if (this== o) return true;
         if (o ==null|| getClass() != o.getClass()) return false;
 
-        DiceId that = (DiceId) o;
+        ColumnId that = (ColumnId) o;
 
         return Objects.equals(form, that.form) 
-        		&& Objects.equals(ordinalNumber, that.ordinalNumber);
+        		&& Objects.equals(columnType, that.columnType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(form, ordinalNumber);
+        return Objects.hash(form, columnType);
     }
 }

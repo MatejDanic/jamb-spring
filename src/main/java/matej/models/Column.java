@@ -7,9 +7,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -18,35 +17,27 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import matej.constants.JambConstants;
+import matej.models.composite.ColumnId;
 import matej.models.enums.BoxType;
 import matej.models.enums.ColumnType;
 
 @Entity
-@Table(name="\"column\"")
+@Table(name = "\"column\"")
+@IdClass(ColumnId.class)
 public class Column {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
 
+	@Id
 	@ManyToOne
-	@JoinColumn(name = "form_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "form_id", referencedColumnName = "id")
 	private Form form;
 
-	@javax.persistence.Column(name = "type", nullable = false)
+	@Id
+	@javax.persistence.Column(name = "column_type", nullable = false)
 	private ColumnType columnType;
 
 	@JsonIgnoreProperties("column")
 	@OneToMany(mappedBy = "column", cascade = CascadeType.ALL)
 	private List<Box> boxes;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public Form getForm() {
 		return form;
@@ -65,7 +56,8 @@ public class Column {
 	}
 
 	public List<Box> getBoxes() {
-		Collections.sort(boxes, (a, b) -> a.getBoxType().ordinal() < b.getBoxType().ordinal() ? -1 : a.getBoxType().ordinal() == b.getBoxType().ordinal() ? 0 : 1);
+		Collections.sort(boxes, (a, b) -> a.getBoxType().ordinal() < b.getBoxType().ordinal() ? -1
+				: a.getBoxType().ordinal() == b.getBoxType().ordinal() ? 0 : 1);
 		return boxes;
 	}
 
@@ -86,7 +78,8 @@ public class Column {
 
 	public boolean isCompleted() {
 		for (Box box : boxes) {
-			if (!box.isFilled()) return false;
+			if (!box.isFilled())
+				return false;
 		}
 		return true;
 	}
@@ -97,14 +90,21 @@ public class Column {
 		int labelSum = 0;
 		boolean diffReady = true;
 		for (Box box : boxes) {
-			if (box.getBoxType() == BoxType.ONES || box.getBoxType() == BoxType.MAX || box.getBoxType() == BoxType.MIN) {
-				if (!box.isFilled()) diffReady = false;
+			if (box.getBoxType() == BoxType.ONES || box.getBoxType() == BoxType.MAX
+					|| box.getBoxType() == BoxType.MIN) {
+				if (!box.isFilled())
+					diffReady = false;
 			}
-			if (box.getBoxType().ordinal() <= 5) numberSum += box.getValue();
-			else if (box.getBoxType().ordinal() >= 8) labelSum += box.getValue();
+			if (box.getBoxType().ordinal() <= 5)
+				numberSum += box.getValue();
+			else if (box.getBoxType().ordinal() >= 8)
+				labelSum += box.getValue();
 		}
-		if (numberSum >= JambConstants.NUMBERSUM_BONUS_THRESHOLD) numberSum += JambConstants.NUMBERSUM_BONUS;
-		if (diffReady) diffSum = (getBoxByType(BoxType.MAX).getValue() - getBoxByType(BoxType.MIN).getValue()) * getBoxByType(BoxType.ONES).getValue();
+		if (numberSum >= JambConstants.NUMBERSUM_BONUS_THRESHOLD)
+			numberSum += JambConstants.NUMBERSUM_BONUS;
+		if (diffReady)
+			diffSum = (getBoxByType(BoxType.MAX).getValue() - getBoxByType(BoxType.MIN).getValue())
+					* getBoxByType(BoxType.ONES).getValue();
 		return numberSum + diffSum + labelSum;
 	}
 
@@ -116,7 +116,8 @@ public class Column {
 
 		boolean diffReady = true;
 		for (Box box : boxes) {
-			if (box.getBoxType() == BoxType.ONES || box.getBoxType() == BoxType.MAX || box.getBoxType() == BoxType.MIN) {
+			if (box.getBoxType() == BoxType.ONES || box.getBoxType() == BoxType.MAX
+					|| box.getBoxType() == BoxType.MIN) {
 				if (!box.isFilled()) {
 					diffReady = false;
 				}
@@ -130,7 +131,8 @@ public class Column {
 		if (sums.get("numberSum") >= JambConstants.NUMBERSUM_BONUS_THRESHOLD)
 			sums.replace("numberSum", sums.get("numberSum") + JambConstants.NUMBERSUM_BONUS);
 		if (diffReady) {
-			sums.replace("diffSum", (getBoxByType(BoxType.MAX).getValue() - getBoxByType(BoxType.MIN).getValue()) * getBoxByType(BoxType.ONES).getValue());
+			sums.replace("diffSum", (getBoxByType(BoxType.MAX).getValue() - getBoxByType(BoxType.MIN).getValue())
+					* getBoxByType(BoxType.ONES).getValue());
 		}
 		return sums;
 	}

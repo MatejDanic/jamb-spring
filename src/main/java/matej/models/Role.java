@@ -1,5 +1,6 @@
 package matej.models;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,10 +15,10 @@ public class Role {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@javax.persistence.Column(name = "label")
+	@Column(name = "label")
 	private String label;
 
-	@javax.persistence.Column(name = "description")
+	@Column(name = "description")
     private String description;
 
     public Role() {

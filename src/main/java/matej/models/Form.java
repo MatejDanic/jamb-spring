@@ -71,7 +71,7 @@ public class Form {
 	}
 
 	public List<Dice> getDice() {
-		Collections.sort(dice, (a, b) -> a.getLabel() < b.getLabel() ? -1 : a.getLabel() == b.getLabel() ? 0 : 1);
+		Collections.sort(dice, (a, b) -> a.getOrdinalNumber() < b.getOrdinalNumber() ? -1 : a.getOrdinalNumber() == b.getOrdinalNumber() ? 0 : 1);
 		return dice;
 	}
 
@@ -109,7 +109,7 @@ public class Form {
 	public Dice getDiceByOrdinalNumber(int ordinalNumber) {
 		Dice newDice = new Dice();
 		for (Dice d : dice) {
-			if (d.getLabel() == ordinalNumber) newDice = d;
+			if (d.getOrdinalNumber() == ordinalNumber) newDice = d;
 			break;
 		}
 		return newDice;
@@ -151,5 +151,22 @@ public class Form {
 			}
 		}
 		return announcementRequired;
+	}
+
+	@Override
+	public String toString() {
+		String string = "User:" + user.getUsername();
+		string += "\nColumns:";
+		for (Column column : columns) {
+			string += "\n" + column.getColumnType() + ":\n";
+			for (Box box : column.getBoxes()) {
+				string += box.getBoxType() + " ";
+			}
+		}
+		string += "\nDice:";
+		for (Dice d : dice) {
+			string += d.getOrdinalNumber() + " ";
+		}
+		return string;
 	}
 }

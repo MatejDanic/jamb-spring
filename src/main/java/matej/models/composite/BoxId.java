@@ -4,34 +4,37 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import matej.models.enums.BoxType;
+import matej.models.Column;
 
 public class BoxId implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	private int column;
-	
-	private BoxType boxType;
-	
-	public BoxId() {}
- 
-    public BoxId(int column, BoxType boxType) {
+    private Column column;
+
+    private BoxType boxType;
+
+    public BoxId() {
+    }
+
+    public BoxId(Column column, BoxType boxType) {
         this.column = column;
         this.boxType = boxType;
     }
-    
+
     @Override
     public boolean equals(Object o) {
-        if (this== o) return true;
-        if (o ==null|| getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         BoxId that = (BoxId) o;
 
-        return Objects.equals(column, that.column) 
-        		&& Objects.equals(boxType, that.boxType);
+        return Objects.equals(column, that.column) && Objects.equals(boxType, that.boxType);
     }
 
     @Override

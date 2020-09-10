@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -35,11 +36,11 @@ public class User {
     @OneToOne(mappedBy="user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private Form form;
     
-    @javax.persistence.Column(name="username", nullable=false, unique=true)
+    @Column(name="username", nullable=false, unique=true)
     @Size(min = 3, max = 15)
     private String username;
     
-    @javax.persistence.Column(name="password", nullable=false)
+    @Column(name="password", nullable=false)
     private String password;
     
     @ManyToMany(fetch=FetchType.LAZY)
