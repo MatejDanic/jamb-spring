@@ -36,7 +36,7 @@ public class Form {
 	private List<Column> columns;
 
 	@JsonIgnoreProperties("form")
-	@OneToMany(mappedBy = "form", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
     private List<Dice> dice;
 
 	@javax.persistence.Column(name = "roll_count", nullable = false)
