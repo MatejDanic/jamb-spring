@@ -127,14 +127,17 @@ public class FormService {
 			form.setRollCount(form.getRollCount() + 1);
 			
 		}
+		List<Dice> dice = form.getDice();
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
-			Dice dice = form.getDiceByOrdinalNumber(entry.getKey());
+			Dice d = form.getDiceByOrdinalNumber(entry.getKey());
 			if (entry.getValue()) {
-				dice.setForm(form);
-				dice.setOrdinalNumber(entry.getKey());
-				dice.roll();
+				d.setForm(form);
+				d.setOrdinalNumber(entry.getKey());
+				d.roll();
+				dice.add(d);
 			}
 		}
+		form.setDice(dice);
 		formRepo.save(form);
 		return form.getDice();
 	}
