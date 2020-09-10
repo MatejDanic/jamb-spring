@@ -125,23 +125,18 @@ public class FormService {
 
 		if (form.getRollCount() < JambConstants.NUM_OF_ROLLS) {
 			form.setRollCount(form.getRollCount() + 1);
-			
+			formRepo.save(form);
 		}
 		List<Dice> dice = form.getDice();
-		List<Dice> newDice = new ArrayList<>();
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
 			for (Dice d : dice) {
-				if (d.getOrdinalNumber() == entry.getKey() && entry.getValue()) {
-					if (entry.getValue()) {
-						d.setForm(form);
-						d.setOrdinalNumber(entry.getKey());
-						d.roll();
-					}
-					newDice.add(d);
+				if (entry.getKey() == d.getOrdinalNumber()) {
+					if (entry.getValue()) d.roll();
+					break;
 				}
 			}
 		}
-		form.setDice(newDice);
+		form.setDice(dice);
 		formRepo.save(form);
 		return form.getDice();
 	}

@@ -59,7 +59,6 @@ public class Dice {
 	
 	@Override
 	public String toString() {
-		return form.getId() + " Dice #" + ordinalNumber + ": " + value;
+		return "Dice #" + ordinalNumber + ": " + value;
 	}
-	
 }

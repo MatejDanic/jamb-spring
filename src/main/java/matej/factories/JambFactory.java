@@ -40,7 +40,6 @@ public class JambFactory {
 		form.setRollCount(0);
 		form.setAnnouncement(null);
 		form.setUser(user);
-		System.out.println("Returning Created Form " + form);
 		return form;
 	}
 
@@ -54,7 +53,6 @@ public class JambFactory {
 	}
 
 	public static List<Column> createColumns(Form form) {
-		System.out.println("Creating Columns...");
 		List<Column> columns = new ArrayList<>();
 		for (ColumnType columnType : ColumnType.values()) {
 			Column column = new Column();
@@ -66,7 +64,6 @@ public class JambFactory {
 	}
 
 	public static List<Box> createBoxes(Column column) {
-		System.out.println("Creating Boxes...");
 		List<Box> boxes = new ArrayList<>();
 		for (BoxType boxType : BoxType.values()) {
 			Box box = new Box();
@@ -84,7 +81,6 @@ public class JambFactory {
 	}
 
 	public static List<Dice> createDice(Form form) {
-		System.out.println("Creating Dice...");
 		List<Dice> diceList = new ArrayList<>();
 		for (int i = 0; i < JambConstants.NUM_OF_DICE; i++) {
 			Dice dice = new Dice();

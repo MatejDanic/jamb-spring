@@ -28,7 +28,7 @@ public class Column {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "form_id", referencedColumnName = "id")
+	@JoinColumn(name = "form_id", referencedColumnName = "id", nullable = false)
 	private Form form;
 
 	@Id
