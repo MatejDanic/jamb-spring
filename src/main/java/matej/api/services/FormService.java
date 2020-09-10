@@ -1,5 +1,6 @@
 package matej.api.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -128,16 +129,20 @@ public class FormService {
 			
 		}
 		List<Dice> dice = form.getDice();
+		List<Dice> newDice = new ArrayList<>();
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
-			Dice d = form.getDiceByOrdinalNumber(entry.getKey());
-			if (entry.getValue()) {
-				d.setForm(form);
-				d.setOrdinalNumber(entry.getKey());
-				d.roll();
-				dice.add(d);
+			for (Dice d : dice) {
+				if (d.getOrdinalNumber() == entry.getKey() && entry.getValue()) {
+					if (entry.getValue()) {
+						d.setForm(form);
+						d.setOrdinalNumber(entry.getKey());
+						d.roll();
+					}
+					newDice.add(d);
+				}
 			}
 		}
-		form.setDice(dice);
+		form.setDice(newDice);
 		formRepo.save(form);
 		return form.getDice();
 	}
