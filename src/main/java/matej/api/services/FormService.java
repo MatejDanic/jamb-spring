@@ -70,7 +70,6 @@ public class FormService {
 			return formRepo.findById(user.getForm().getId()).get();
 		} else {
 			Form form = JambFactory.createForm(user);
-			System.out.println(form);
 			return formRepo.save(form);
 		}
 	}
