@@ -102,4 +102,13 @@ public class User {
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
+	@Override
+	public String toString() {
+        String string = username;
+        for (Role role : roles) {
+            string += role.getLabel() + ": " + role.getdescription() + "\n";
+        }
+		return string;
+	}
 }

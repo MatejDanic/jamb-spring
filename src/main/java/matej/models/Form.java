@@ -140,7 +140,7 @@ public class Form {
 		return sums;
 	}
 
-	public boolean isAnnouncementRequired() {
+	public boolean checkAnnouncementRequired() {
 		boolean announcementRequired = (announcement == null);
 		for (Column column : columns) {
 			if (column.getColumnType() != ColumnType.ANNOUNCEMENT) {
@@ -155,17 +155,14 @@ public class Form {
 
 	@Override
 	public String toString() {
-		String string = "User:" + user.getUsername();
-		string += "\nColumns:";
+		String string = "User: " + user;
+		string += "\nColumns:\n";
 		for (Column column : columns) {
-			string += "\n" + column.getColumnType() + ":\n";
-			for (Box box : column.getBoxes()) {
-				string += box.getBoxType() + " ";
-			}
+			string += column + "\n";
 		}
 		string += "\nDice:";
 		for (Dice d : dice) {
-			string += d.getOrdinalNumber() + " ";
+			string += d + " ";
 		}
 		return string;
 	}

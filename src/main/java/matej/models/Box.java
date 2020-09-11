@@ -85,4 +85,8 @@ public class Box {
 		return value;
 	}
 
+	@Override
+	public String toString() {
+		return boxType + ": " + value + "(filled-" + filled + ", available-" + available + ")";
+	}
 }

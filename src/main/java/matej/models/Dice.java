@@ -59,6 +59,6 @@ public class Dice {
 	
 	@Override
 	public String toString() {
-		return "Dice #" + ordinalNumber + ": " + value;
+		return "D#" + ordinalNumber + ": " + value;
 	}
 }

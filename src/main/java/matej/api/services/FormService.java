@@ -1,6 +1,5 @@
 package matej.api.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -120,7 +119,7 @@ public class FormService {
 			diceToThrow.replaceAll((k, v) -> v = true);
 		else if (form.getRollCount() == JambConstants.NUM_OF_ROLLS)
 			throw new IllegalMoveException("Dice roll limit reached!");
-		else if (form.getRollCount() > 0 && form.isAnnouncementRequired() && form.getAnnouncement() == null)
+		else if (form.getRollCount() > 0 && form.checkAnnouncementRequired() && form.getAnnouncement() == null)
 			throw new IllegalMoveException("Announcement is required!");
 
 		if (form.getRollCount() < JambConstants.NUM_OF_ROLLS) {
@@ -210,7 +209,6 @@ public class FormService {
 	}
 
 	public void advanceColumn(Form form, int columnTypeOrdinal, int boxTypeOrdinal) {
-		Box nextBox = new Box();
 		Column column = form.getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
 		if (column.getColumnType() == ColumnType.DOWNWARDS) {
 			boxTypeOrdinal++;
@@ -220,10 +218,9 @@ public class FormService {
 			return;
 		}
 		try {
-			nextBox = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
+			Box nextBox = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
 			nextBox.setAvailable(true);
-			nextBox.setColumn(column);
-			boxRepo.save(nextBox);
+			formRepo.save(form);
 		} catch (IndexOutOfBoundsException e) {
 			System.out.println(e.getMessage());
 		}

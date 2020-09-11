@@ -136,5 +136,13 @@ public class Column {
 		}
 		return sums;
 	}
-
+	
+	@Override
+	public String toString() {
+		String string = columnType + ":\n";
+		for (Box box : boxes) {
+			string += box + "\n";
+		}
+		return string;
+	}
 }
