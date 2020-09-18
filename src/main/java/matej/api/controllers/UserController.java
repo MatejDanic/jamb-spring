@@ -17,7 +17,6 @@ import matej.models.User;
 
 @RestController
 @CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
-@PreAuthorize("isAuthenticated()")
 @RequestMapping("/users")
 public class UserController {
 
