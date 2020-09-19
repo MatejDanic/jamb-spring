@@ -28,6 +28,7 @@ public class Form {
 	private int id;
 
 	@OneToOne
+    @JsonIgnoreProperties({"scores", "form"})
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
