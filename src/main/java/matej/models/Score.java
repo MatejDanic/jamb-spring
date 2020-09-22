@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name="score")
 public class Score {
@@ -20,6 +22,7 @@ public class Score {
 	private int id;
 
 	@ManyToOne
+    @JsonIgnoreProperties({"scores", "form"})
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
