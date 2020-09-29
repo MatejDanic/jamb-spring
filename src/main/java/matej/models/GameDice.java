@@ -10,17 +10,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import matej.models.composite.DiceId;
+import matej.models.keys.DiceId;
 
 @Entity
-@Table(name="dice")
+@Table(name="game_dice")
 @IdClass(DiceId.class)
-public class Dice {
+public class GameDice {
 
 	@Id
 	@ManyToOne
 	@JoinColumn(name = "form_id", referencedColumnName = "id", nullable = false)
-	private Form form;
+	private GameForm form;
 	
 	@Id
 	@Column(name = "ordinal_number")
@@ -29,11 +29,11 @@ public class Dice {
 	@javax.persistence.Column(name = "value")
 	private int value;
 
-	public Form getForm() {
+	public GameForm getForm() {
 		return form;
 	}
 
-	public void setForm(Form form) {
+	public void setForm(GameForm form) {
 		this.form = form;
 	}
 

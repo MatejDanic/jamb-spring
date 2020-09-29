@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.UserService;
-import matej.models.User;
+import matej.models.AuthUser;
 
 
 @RestController
@@ -24,12 +24,12 @@ public class UserController {
 	UserService userService;
 
     @GetMapping("")
-	public List<User> getUsers() {
+	public List<AuthUser> getUsers() {
         return userService.getUsers();
 	}
 
 	@GetMapping("/{id}")
-	public User getUserById(@PathVariable int id) {
+	public AuthUser getUserById(@PathVariable int id) {
 		return userService.getUserById(id);
 	}
 

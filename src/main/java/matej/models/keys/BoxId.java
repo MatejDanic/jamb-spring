@@ -1,10 +1,10 @@
-package matej.models.composite;
+package matej.models.keys;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import matej.models.enums.BoxType;
-import matej.models.Column;
+import matej.models.GameColumn;
+import matej.models.types.BoxType;
 
 public class BoxId implements Serializable {
 
@@ -13,14 +13,14 @@ public class BoxId implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    private Column column;
+    private GameColumn column;
 
     private BoxType boxType;
 
     public BoxId() {
     }
 
-    public BoxId(Column column, BoxType boxType) {
+    public BoxId(GameColumn column, BoxType boxType) {
         this.column = column;
         this.boxType = boxType;
     }

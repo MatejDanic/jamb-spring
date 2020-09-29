@@ -2,8 +2,8 @@ package matej.api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import matej.models.Score;
+import matej.models.GameScore;
 
-public interface ScoreRepository extends JpaRepository<Score, Integer> {
+public interface ScoreRepository extends JpaRepository<GameScore, Integer> {
 	
 }

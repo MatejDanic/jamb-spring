@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import matej.models.Role;
+import matej.models.AuthRole;
 
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<AuthRole, Integer> {
 	
-	Optional<Role> findByLabel(String label);
+	Optional<AuthRole> findByLabel(String label);
 	
 }

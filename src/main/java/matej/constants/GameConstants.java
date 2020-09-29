@@ -7,7 +7,7 @@ package matej.constants;
  * @version 1.0
  * @since 2020-08-20
  */
-public class JambConstants {
+public class GameConstants {
 	
 	public static final int NUM_OF_DICE = 5;
 	public static final int NUM_OF_ROLLS = 3;

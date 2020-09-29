@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "auth_user")
-public class User {
+public class AuthUser {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,11 @@ public class User {
 
     @JsonIgnoreProperties("user")
     @OneToMany(mappedBy="user", cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}) 
-    private List<Score> scores;
+    private List<GameScore> scores;
 
     @JsonIgnore
     @OneToOne(mappedBy="user", cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
-    private Form form;
+    private GameForm form;
     
     @Column(name="username", nullable=false, unique=true)
     @Size(min = 3, max = 15)
@@ -47,12 +47,12 @@ public class User {
     
     @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(name = "auth_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<AuthRole> roles;
 
-    public User() {
+    public AuthUser() {
     }
 
-    public User(String username, String password) {
+    public AuthUser(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -65,19 +65,19 @@ public class User {
         this.id = id;
     }
     
-    public List<Score> getScores() {
+    public List<GameScore> getScores() {
         return scores;
     }
 
-    public void setScores(List<Score> scores) {
+    public void setScores(List<GameScore> scores) {
         this.scores = scores;
     }
 
-    public Form getForm() {
+    public GameForm getForm() {
         return form;
     }
 
-    public void setForm(Form form) {
+    public void setForm(GameForm form) {
         this.form = form;
     }
     
@@ -97,18 +97,18 @@ public class User {
         this.password = password;
     }
         
-    public Set<Role> getRoles() {
+    public Set<AuthRole> getRoles() {
         return roles;
     }
     
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Set<AuthRole> roles) {
         this.roles = roles;
     }
 
 	@Override
 	public String toString() {
         String string = username;
-        for (Role role : roles) {
+        for (AuthRole role : roles) {
             string += role.getLabel() + ": " + role.getdescription() + "\n";
         }
 		return string;

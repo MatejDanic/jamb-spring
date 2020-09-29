@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import matej.api.repositories.UserRepository;
-import matej.models.Score;
-import matej.models.User;
+import matej.models.AuthUser;
+import matej.models.GameScore;
 
 /**
  * Service Class for managing {@link User} repostiory
@@ -22,7 +22,7 @@ public class UserService {
     @Autowired
     UserRepository userRepo;
 
-    public List<User> getUsers() {
+    public List<AuthUser> getUsers() {
         return userRepo.findAll();
     }
 
@@ -30,11 +30,11 @@ public class UserService {
         userRepo.deleteById(id);
     }
 
-    public User getUserById(int id) {
+    public AuthUser getUserById(int id) {
         return userRepo.findById(id).get();
     }
 
-    public List<Score> getUserScores(int id) {
+    public List<GameScore> getUserScores(int id) {
         return userRepo.findById(id).get().getScores();
     }
 }

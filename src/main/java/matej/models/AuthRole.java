@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "auth_role")
-public class Role {
+public class AuthRole {
     
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,10 +21,10 @@ public class Role {
 	@Column(name = "description")
     private String description;
 
-    public Role() {
+    public AuthRole() {
     }
 
-    public Role(String label) {
+    public AuthRole(String label) {
         this.label = label;
     }
 

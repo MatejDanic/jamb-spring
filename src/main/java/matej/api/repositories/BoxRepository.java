@@ -2,8 +2,8 @@ package matej.api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import matej.models.Box;
+import matej.models.GameBox;
 
-public interface BoxRepository extends JpaRepository<Box, Integer> {
+public interface BoxRepository extends JpaRepository<GameBox, Integer> {
 	
 }

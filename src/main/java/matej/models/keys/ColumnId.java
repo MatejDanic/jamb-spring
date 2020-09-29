@@ -1,10 +1,10 @@
-package matej.models.composite;
+package matej.models.keys;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import matej.models.Form;
-import matej.models.enums.ColumnType;
+import matej.models.GameForm;
+import matej.models.types.ColumnType;
 
 public class ColumnId implements Serializable {
 
@@ -13,13 +13,13 @@ public class ColumnId implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Form form;
+	private GameForm form;
 	
 	private ColumnType columnType;
 	
 	public ColumnId() {}
  
-    public ColumnId(Form form, ColumnType columnType) {
+    public ColumnId(GameForm form, ColumnType columnType) {
         this.form = form;
         this.columnType = columnType;
     }
