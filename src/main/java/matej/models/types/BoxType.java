@@ -8,17 +8,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-// ONES, TWOS, THREES, FOURS, FIVES, SIXES, MAX, MIN, TRIPS, STRAIGHT, FULL,
-	// POKER, JAMB;
-
 @Entity
-@Table(name="box_type")
+@Table(name = "box_type")
 public class BoxType {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column(name = "label", nullable = false)
 	private String label;
 
@@ -26,7 +23,8 @@ public class BoxType {
 		this.label = label;
 	}
 
-	private BoxType() { }
+	public BoxType() {
+	}
 
 	public int getId() {
 		return id;

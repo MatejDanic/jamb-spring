@@ -23,7 +23,8 @@ public class ColumnType {
 		this.label = label;
 	}
 
-	private ColumnType() { }
+	public ColumnType() {
+	}
 
 	public int getId() {
 		return id;
