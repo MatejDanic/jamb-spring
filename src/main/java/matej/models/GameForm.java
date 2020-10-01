@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
@@ -122,6 +123,15 @@ public class GameForm {
 		return finalSum;
 	}
 
+	@JsonIgnore
+	public boolean isCompleted() {
+		for (GameColumn column : columns) {
+			if (!column.isCompleted())
+				return false;
+		}
+		return true;
+	}
+
 	public Map<String, Integer> calculateSums() {
 		Map<String, Integer> sums = new HashMap<>();
 		Map<String, Integer> columnSums;
@@ -139,10 +149,10 @@ public class GameForm {
 		return sums;
 	}
 
-	public boolean checkAnnouncementRequired() {
+	public boolean isAnnouncementRequired() {
 		boolean announcementRequired = (announcement == null);
 		for (GameColumn column : columns) {
-			if (column.getColumnType().getLabel() != "ANNOUNCEMENT") {
+			if (column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
 				if (!column.isCompleted()) {
 					announcementRequired = false;
 					break;

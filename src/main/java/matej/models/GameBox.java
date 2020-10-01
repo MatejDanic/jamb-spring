@@ -23,12 +23,12 @@ public class GameBox {
 	@Id
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "form_id", referencedColumnName = "form_id", nullable = false),
-				  @JoinColumn(name = "column_type", referencedColumnName = "column_type", nullable = false) })
+				  @JoinColumn(name = "column_type", referencedColumnName = "column_type_id", nullable = false) })
 	private GameColumn column;
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "box_type", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "box_type_id", referencedColumnName = "id", nullable = false)
 	private BoxType boxType;
 
 	@Column(name = "value")
@@ -89,6 +89,6 @@ public class GameBox {
 
 	@Override
 	public String toString() {
-		return boxType + ": " + value + "(filled-" + filled + ", available-" + available + ")";
+		return boxType + ": " + value + " (FILLED-" + filled + ", AVAILABLE-" + available + ")";
 	}
 }

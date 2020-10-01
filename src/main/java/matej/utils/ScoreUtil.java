@@ -85,7 +85,7 @@ public final class ScoreUtil {
 	 */
 	public static int calculateSumByType(List<Integer> diceValues, BoxType boxType) {
 		int sum = 0;
-		int type = boxType.getId() + 1; // type of box is by 1 larger than boxType ordinal because ordinals start at 0
+		int type = boxType.getId(); // type of box is by 1 larger than boxType ordinal because ordinals start at 0
 		for (int value : diceValues) {
 			if (value == type) {
 				sum += value; // if dice value is equal to box type add to sum

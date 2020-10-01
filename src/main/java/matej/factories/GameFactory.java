@@ -68,11 +68,12 @@ public class GameFactory {
 			GameBox box = new GameBox();
 			box.setColumn(column);
 			box.setBoxType(boxType);
-			if (column.getColumnType().getLabel() == "ANY_DIRECTION" || column.getColumnType().getLabel() == "ANNOUNCEMENT")
+			if (column.getColumnType().getLabel().equals("ANY_DIRECTION") || column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
 				box.setAvailable(true);
-			else if (column.getColumnType().getLabel() == "DOWNWARDS" && boxType.getLabel() == "ONES")
+			}
+			else if (column.getColumnType().getLabel().equals("DOWNWARDS") && boxType.getLabel().equals("ONES"))
 				box.setAvailable(true);
-			else if (column.getColumnType().getLabel() == "UPWARDS" && boxType.getLabel() == "JAMB")
+			else if (column.getColumnType().getLabel().equals("UPWARDS") && boxType.getLabel().equals("JAMB"))
 				box.setAvailable(true);
 			boxes.add(box);
 		}

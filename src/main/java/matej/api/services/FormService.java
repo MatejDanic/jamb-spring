@@ -72,9 +72,11 @@ public class FormService {
 	public GameForm initializeForm(String username) throws UsernameNotFoundException {
 		AuthUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		if (user.getForm() != null) {
+			// System.out.println(formRepo.findById(user.getForm().getId()).get());
 			return formRepo.findById(user.getForm().getId()).get();
 		} else {
 			GameForm form = GameFactory.createForm(user, columnTypeRepo.findAll(), boxTypeRepo.findAll());
+			// System.out.println(form);
 			return formRepo.save(form);
 		}
 	}
@@ -102,13 +104,13 @@ public class FormService {
 		return formRepo.findById(id).get();
 	}
 
-	public GameColumn getColumn(int id, int columnTypeOrdinal) {
-		return getFormById(id).getColumnByTypeId(columnTypeOrdinal);
+	public GameColumn getColumn(int id, int columnTypeId) {
+		return getFormById(id).getColumnByTypeId(columnTypeId);
 	}
 
-	public GameBox getColumnBox(int id, int columnTypeOrdinal, int boxTypeOrdinal) {
-		return getFormById(id).getColumnByTypeId(columnTypeOrdinal)
-				.getBoxByTypeId(boxTypeOrdinal);
+	public GameBox getColumnBox(int id, int columnTypeId, int boxTypeId) {
+		return getFormById(id).getColumnByTypeId(columnTypeId)
+				.getBoxByTypeId(boxTypeId);
 	}
 
 	public List<GameForm> getFormList() {
@@ -125,7 +127,7 @@ public class FormService {
 			diceToThrow.replaceAll((k, v) -> v = true);
 		else if (form.getRollCount() == GameConstants.NUM_OF_ROLLS)
 			throw new IllegalMoveException("Dice roll limit reached!");
-		else if (form.getRollCount() > 0 && form.checkAnnouncementRequired() && form.getAnnouncement() == null)
+		else if (form.getRollCount() > 0 && form.isAnnouncementRequired() && form.getAnnouncement() == null)
 			throw new IllegalMoveException("Announcement is required!");
 
 		if (form.getRollCount() < GameConstants.NUM_OF_ROLLS) {
@@ -146,7 +148,7 @@ public class FormService {
 		return form.getDice();
 	}
 
-	public int announce(String username, int id, int announcementOrdinal)
+	public int announce(String username, int id, int boxTypeId)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
 			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
@@ -157,13 +159,13 @@ public class FormService {
 			throw new IllegalMoveException("Announcement already declared!");
 		if (form.getRollCount() >= 2)
 			throw new IllegalMoveException("Announcement unavailable after second roll!");
-
-		form.setAnnouncement(announcementOrdinal);
+		
+		form.setAnnouncement(boxTypeId);
 		formRepo.save(form);
-		return announcementOrdinal;
+		return boxTypeId;
 	}
 
-	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
+	public int fillBox(String username, int id, int columnTypeId, int boxTypeId)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
 			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
@@ -171,25 +173,25 @@ public class FormService {
 		AuthUser user = userRepo.findByUsername(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 		GameForm form = getFormById(id);
-		GameColumn column = form.getColumnByTypeId(columnTypeOrdinal);
-		GameBox box = column.getBoxByTypeId(boxTypeOrdinal);
+		GameColumn column = form.getColumnByTypeId(columnTypeId);
+		GameBox box = column.getBoxByTypeId(boxTypeId);
 
 		if (box.isFilled())
 			throw new IllegalMoveException("Box already filled!");
 		else if (form.getRollCount() == 0)
 			throw new IllegalMoveException("Cannot fill box without rolling dice!");
-		else if (!box.isAvailable() && boxTypeRepo.findById(form.getAnnouncement()).get() == null)
-			throw new IllegalMoveException("Box is currently not available!");
-		else if (form.getAnnouncement() != null && boxTypeRepo.findById(form.getAnnouncement()).get().getLabel() != box.getBoxType().getLabel())
+		else if (!box.isAvailable())
+			throw new IllegalMoveException("Box is unavailable!");
+		else if (form.getAnnouncement() != null && boxTypeRepo.findById(form.getAnnouncement()).get().getId() != box.getBoxType().getId())
 			throw new IllegalMoveException("Box is not the same as announcement!");
 
 		box.fill(form.getDice());
 		box.setColumn(column);
 
-		advanceColumn(form, columnTypeOrdinal, boxTypeOrdinal);
+		advanceColumn(form, columnTypeId, boxTypeId);
 		column.setForm(form);
 
-		if (isFormCompleted(form)) {
+		if (form.isCompleted()) {
 			deleteFormSaveScore(form, user, form.calculateFinalSum());
 		} else {
 			form.setRollCount(0);
@@ -199,32 +201,17 @@ public class FormService {
 		return box.getValue();
 	}
 
-	public Map<String, Integer> getSums(String username, int id) throws InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
-		GameForm form = getFormById(id);
-		return form.calculateSums();
-	}
-
-	private boolean isFormCompleted(GameForm form) {
-		for (GameColumn column : form.getColumns()) {
-			if (!column.isCompleted())
-				return false;
-		}
-		return true;
-	}
-
-	public void advanceColumn(GameForm form, int columnTypeOrdinal, int boxTypeOrdinal) {
-		GameColumn column = form.getColumnByTypeId(columnTypeOrdinal);
-		if (column.getColumnType().getLabel() == "DOWNWARDS") {
-			boxTypeOrdinal++;
-		} else if (column.getColumnType().getLabel() == "UPWARDS") {
-			boxTypeOrdinal--;
+	public void advanceColumn(GameForm form, int columnTypeId, int boxTypeId) {
+		GameColumn column = form.getColumnByTypeId(columnTypeId);
+		if (column.getColumnType().getLabel().equals("DOWNWARDS")) {
+			boxTypeId++;
+		} else if (column.getColumnType().getLabel().equals("UPWARDS")) {
+			boxTypeId--;
 		} else {
 			return;
 		}
 		try {
-			GameBox nextBox = column.getBoxByTypeId(boxTypeOrdinal);
+			GameBox nextBox = column.getBoxByTypeId(boxTypeId);
 			nextBox.setAvailable(true);
 			formRepo.save(form);
 		} catch (IndexOutOfBoundsException e) {

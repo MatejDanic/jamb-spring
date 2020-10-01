@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import matej.constants.GameConstants;
@@ -32,7 +33,7 @@ public class GameColumn {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "column_type", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "column_type_id", referencedColumnName = "id", nullable = false)
 	private ColumnType columnType;
 
 	@JsonIgnoreProperties("column")
@@ -79,7 +80,7 @@ public class GameColumn {
 	public GameBox getBoxByTypeLabel(String boxTypeLabel) {
 		GameBox box = new GameBox();
 		for (GameBox b : boxes) {
-			if (b.getBoxType().getLabel() == boxTypeLabel) {
+			if (b.getBoxType().getLabel().equals(boxTypeLabel)) {
 				box = b;
 				break;
 			}
@@ -87,6 +88,7 @@ public class GameColumn {
 		return box;
 	}
 
+	@JsonIgnore
 	public boolean isCompleted() {
 		for (GameBox box : boxes) {
 			if (!box.isFilled())
@@ -101,8 +103,8 @@ public class GameColumn {
 		int labelSum = 0;
 		boolean diffReady = true;
 		for (GameBox box : boxes) {
-			if (box.getBoxType().getLabel() == "ONES" || box.getBoxType().getLabel() == "MAX"
-					|| box.getBoxType().getLabel() == "MIN") {
+			if (box.getBoxType().getLabel().equals("ONES") || box.getBoxType().getLabel().equals("MAX")
+					|| box.getBoxType().getLabel().equals("MIN")) {
 				if (!box.isFilled())
 					diffReady = false;
 			}
@@ -127,8 +129,8 @@ public class GameColumn {
 
 		boolean diffReady = true;
 		for (GameBox box : boxes) {
-			if (box.getBoxType().getLabel() == "ONES" || box.getBoxType().getLabel() == "MAX"
-					|| box.getBoxType().getLabel() == "MIN") {
+			if (box.getBoxType().getLabel().equals("ONES") || box.getBoxType().getLabel().equals("MAX")
+					|| box.getBoxType().getLabel().equals("MIN")) {
 				if (!box.isFilled()) {
 					diffReady = false;
 				}
