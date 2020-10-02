@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Table(name="column_type")
 public class ColumnType {
 
-	@Column(name = "id", nullable = false)
+	@Column(name = "id", unique = true, nullable = false)
 	private int id;
 	
 	@Id
