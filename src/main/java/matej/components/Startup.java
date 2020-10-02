@@ -34,15 +34,15 @@ public class Startup implements ApplicationRunner {
         }
 
         if (columnTypeRepo.findAll().size() == 0) {
-            columnTypeRepo.saveAll(Arrays.asList(new ColumnType("DOWNWARDS"), new ColumnType("UPWARDS"),
-                    new ColumnType("ANY_DIRECTION"), new ColumnType("ANNOUNCEMENT")));
+            columnTypeRepo.saveAll(Arrays.asList(new ColumnType(1, "DOWNWARDS"), new ColumnType(2, "UPWARDS"),
+                    new ColumnType(3, "ANY_DIRECTION"), new ColumnType(4, "ANNOUNCEMENT")));
         }
 
         if (boxTypeRepo.findAll().size() == 0) {
-            boxTypeRepo.saveAll(Arrays.asList(new BoxType("ONES"), new BoxType("TWOS"), new BoxType("THREES"),
-                    new BoxType("FOURS"), new BoxType("FIVES"), new BoxType("SIXES"), new BoxType("MAX"),
-                    new BoxType("MIN"), new BoxType("TRIPS"), new BoxType("STRAIGHT"), new BoxType("FULL"),
-                    new BoxType("POKER"), new BoxType("JAMB")));
+            boxTypeRepo.saveAll(Arrays.asList(new BoxType(1, "ONES"), new BoxType(2, "TWOS"), new BoxType(3, "THREES"),
+                    new BoxType(4, "FOURS"), new BoxType(5, "FIVES"), new BoxType(6, "SIXES"), new BoxType(7, "MAX"),
+                    new BoxType(8, "MIN"), new BoxType(9, "TRIPS"), new BoxType(10, "STRAIGHT"), new BoxType(11, "FULL"),
+                    new BoxType(12, "POKER"), new BoxType(13, "JAMB")));
         }
     }
 }

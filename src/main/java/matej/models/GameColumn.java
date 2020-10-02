@@ -33,7 +33,7 @@ public class GameColumn {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "column_type_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "column_type", referencedColumnName = "label", nullable = false)
 	private ColumnType columnType;
 
 	@JsonIgnoreProperties("column")

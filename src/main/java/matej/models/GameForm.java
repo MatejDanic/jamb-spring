@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import matej.models.types.BoxType;
 
 @Entity
 @Table(name="game_form")
@@ -42,8 +44,9 @@ public class GameForm {
 	@javax.persistence.Column(name = "roll_count", nullable = false)
 	private int rollCount;
 	
-	@javax.persistence.Column(name = "announcement", nullable = true)
-	private Integer announcement;
+	@ManyToOne
+	@JoinColumn(name = "announcement", referencedColumnName = "label", nullable = true)
+	private BoxType announcement;
 
 	public int getId() {
 		return id;
@@ -87,11 +90,11 @@ public class GameForm {
 		this.rollCount = rollCount;
 	}
 
-	public Integer getAnnouncement() {
+	public BoxType getAnnouncement() {
 		return announcement;
 	}
 
-	public void setAnnouncement(Integer announcement) {
+	public void setAnnouncement(BoxType announcement) {
 		this.announcement = announcement;
 	}
 
@@ -149,8 +152,9 @@ public class GameForm {
 		return sums;
 	}
 
+	@JsonIgnore
 	public boolean isAnnouncementRequired() {
-		boolean announcementRequired = (announcement == null);
+		boolean announcementRequired = true;
 		for (GameColumn column : columns) {
 			if (column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
 				if (!column.isCompleted()) {

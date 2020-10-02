@@ -24,6 +24,7 @@ import matej.models.GameDice;
 import matej.models.GameForm;
 import matej.models.GameColumn;
 import matej.models.GameScore;
+import matej.models.types.BoxType;
 import matej.models.AuthUser;
 
 /**
@@ -148,21 +149,21 @@ public class FormService {
 		return form.getDice();
 	}
 
-	public int announce(String username, int id, int boxTypeId)
+	public BoxType announce(String username, int formId, BoxType boxType)
 			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		if (!checkOwnership(username, formId))
+			throw new InvalidOwnershipException("Form with id " + formId + " doesn't belong to user " + username);
 
-		GameForm form = getFormById(id);
+		GameForm form = getFormById(formId);
 
 		if (form.getAnnouncement() != null)
 			throw new IllegalMoveException("Announcement already declared!");
 		if (form.getRollCount() >= 2)
 			throw new IllegalMoveException("Announcement unavailable after second roll!");
 		
-		form.setAnnouncement(boxTypeId);
+		form.setAnnouncement(boxType);
 		formRepo.save(form);
-		return boxTypeId;
+		return boxType;
 	}
 
 	public int fillBox(String username, int id, int columnTypeId, int boxTypeId)
@@ -182,7 +183,7 @@ public class FormService {
 			throw new IllegalMoveException("Cannot fill box without rolling dice!");
 		else if (!box.isAvailable())
 			throw new IllegalMoveException("Box is unavailable!");
-		else if (form.getAnnouncement() != null && boxTypeRepo.findById(form.getAnnouncement()).get().getId() != box.getBoxType().getId())
+		else if (form.getAnnouncement() != null && form.getAnnouncement().getId() != box.getBoxType().getId())
 			throw new IllegalMoveException("Box is not the same as announcement!");
 
 		box.fill(form.getDice());

@@ -3,8 +3,6 @@ package matej.models.types;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,14 +10,15 @@ import javax.persistence.Table;
 @Table(name = "box_type")
 public class BoxType {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id", nullable = false)
 	private int id;
 
+	@Id
 	@Column(name = "label", nullable = false)
 	private String label;
 
-	public BoxType(String label) {
+	public BoxType(int id, String label) {
+		this.id = id;
 		this.label = label;
 	}
 
