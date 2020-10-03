@@ -156,7 +156,7 @@ public class GameForm {
 	public boolean isAnnouncementRequired() {
 		boolean announcementRequired = true;
 		for (GameColumn column : columns) {
-			if (column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
+			if (!column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
 				if (!column.isCompleted()) {
 					announcementRequired = false;
 					break;

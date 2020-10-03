@@ -81,7 +81,7 @@ public class AuthController {
 		if (userRepo.existsByUsername(registerRequest.getUsername())) {
 			return ResponseEntity
 			.badRequest()
-			.body(new MessageResponse("Error: Username is already taken!"));
+			.body(new MessageResponse("Greška: Korisničko ime je već zauzeto!"));
 		}
 		
 		// Create new user's account
@@ -93,20 +93,20 @@ public class AuthController {
 		
 		if (strRoles == null) {
 			AuthRole userRole = roleRepo.findByLabel("USER")
-			.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+			.orElseThrow(() -> new RuntimeException("Greška: Uloga nije pronađena."));
 			roles.add(userRole);
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
 					case "admin":
 					AuthRole adminRole = roleRepo.findByLabel("ADMIN")
-					.orElseThrow(() -> new RuntimeException("Error: ADMIN role not found."));
+					.orElseThrow(() -> new RuntimeException("Greška: Admin uloga nije pronađena."));
 					roles.add(adminRole);
 					
 					break;
 					default:
 					AuthRole userRole = roleRepo.findByLabel("USER")
-					.orElseThrow(() -> new RuntimeException("Error: USER role not found."));
+					.orElseThrow(() -> new RuntimeException("Greška: Uloga nije pronađena."));
 					roles.add(userRole);
 				}
 			});

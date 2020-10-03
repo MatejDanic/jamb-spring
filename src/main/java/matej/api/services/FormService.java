@@ -71,7 +71,7 @@ public class FormService {
 	 * @throws UsernameNotFoundException if user with given username does not exist
 	 */
 	public GameForm initializeForm(String username) throws UsernameNotFoundException {
-		AuthUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		AuthUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		if (user.getForm() != null) {
 			// System.out.println(formRepo.findById(user.getForm().getId()).get());
 			return formRepo.findById(user.getForm().getId()).get();
@@ -95,10 +95,9 @@ public class FormService {
 		formRepo.deleteById(id);
 	}
 
-	public void deleteFormSaveScore(GameForm form, AuthUser user, int finalSum) {
+	public void saveScore(GameForm form, AuthUser user, int finalSum) {
 		GameScore score = GameFactory.createScore(user, finalSum);
 		scoreRepo.save(score);
-		formRepo.delete(form);
 	}
 
 	public GameForm getFormById(int id) {
@@ -121,15 +120,15 @@ public class FormService {
 	public List<GameDice> rollDice(String username, int id, Map<Integer, Boolean> diceToThrow)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
 		GameForm form = getFormById(id);
 
 		if (form.getRollCount() == 0)
 			diceToThrow.replaceAll((k, v) -> v = true);
 		else if (form.getRollCount() == GameConstants.NUM_OF_ROLLS)
-			throw new IllegalMoveException("Dice roll limit reached!");
-		else if (form.getRollCount() > 0 && form.isAnnouncementRequired() && form.getAnnouncement() == null)
-			throw new IllegalMoveException("Announcement is required!");
+			throw new IllegalMoveException("Kocka je bačena maksimalni broj puta!");
+		else if (form.getRollCount() == 1 && form.isAnnouncementRequired() && form.getAnnouncement() == null)
+			throw new IllegalMoveException("Najava je obavezna!");
 
 		if (form.getRollCount() < GameConstants.NUM_OF_ROLLS) {
 			form.setRollCount(form.getRollCount() + 1);
@@ -152,14 +151,14 @@ public class FormService {
 	public BoxType announce(String username, int formId, BoxType boxType)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, formId))
-			throw new InvalidOwnershipException("Form with id " + formId + " doesn't belong to user " + username);
+			throw new InvalidOwnershipException("Forma s id-em " + formId + " ne pripada korisniku " + username + ".");
 
 		GameForm form = getFormById(formId);
 
 		if (form.getAnnouncement() != null)
-			throw new IllegalMoveException("Announcement already declared!");
+			throw new IllegalMoveException("Najava je već iskorištena!");
 		if (form.getRollCount() >= 2)
-			throw new IllegalMoveException("Announcement unavailable after second roll!");
+			throw new IllegalMoveException("Najava nije dostupna nakon drugog bacanja!");
 		
 		form.setAnnouncement(boxType);
 		formRepo.save(form);
@@ -169,22 +168,22 @@ public class FormService {
 	public int fillBox(String username, int id, int columnTypeId, int boxTypeId)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+			throw new InvalidOwnershipException("Form s id-em " + id + " ne pripada korisniku " + username + ".");
 
 		AuthUser user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		GameForm form = getFormById(id);
 		GameColumn column = form.getColumnByTypeId(columnTypeId);
 		GameBox box = column.getBoxByTypeId(boxTypeId);
 
 		if (box.isFilled())
-			throw new IllegalMoveException("Box already filled!");
+			throw new IllegalMoveException("Kućica već popunjena!");
 		else if (form.getRollCount() == 0)
-			throw new IllegalMoveException("Cannot fill box without rolling dice!");
+			throw new IllegalMoveException("Ne može se upisati kućica bez bacanja kocki!");
 		else if (!box.isAvailable())
-			throw new IllegalMoveException("Box is unavailable!");
+			throw new IllegalMoveException("Kućica nije dostupna!");
 		else if (form.getAnnouncement() != null && form.getAnnouncement().getId() != box.getBoxType().getId())
-			throw new IllegalMoveException("Box is not the same as announcement!");
+			throw new IllegalMoveException("Kućica nije jednaka najavi!");
 
 		box.fill(form.getDice());
 		box.setColumn(column);
@@ -193,7 +192,7 @@ public class FormService {
 		column.setForm(form);
 
 		if (form.isCompleted()) {
-			deleteFormSaveScore(form, user, form.calculateFinalSum());
+			saveScore(form, user, form.calculateFinalSum());
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
@@ -222,7 +221,7 @@ public class FormService {
 
 	private boolean checkOwnership(String username, int formId) {
 		AuthUser user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		return user.getForm().getId() == formId;
 	}
 
