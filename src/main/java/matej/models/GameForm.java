@@ -10,18 +10,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import matej.models.enums.ColumnType;
-
+import matej.models.types.BoxType;
 
 @Entity
-@Table(name="form")
-public class Form {
+@Table(name="game_form")
+public class GameForm {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,21 +31,22 @@ public class Form {
 	@OneToOne
     @JsonIgnoreProperties({"scores", "form"})
 	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	private AuthUser user;
 	
 	@JsonIgnoreProperties("form")
 	@OneToMany(mappedBy ="form", cascade = CascadeType.ALL)
-	private List<Column> columns;
+	private List<GameColumn> columns;
 
 	@JsonIgnoreProperties("form")
 	@OneToMany(mappedBy = "form", cascade = CascadeType.ALL)
-    private List<Dice> dice;
+    private List<GameDice> dice;
 
 	@javax.persistence.Column(name = "roll_count", nullable = false)
 	private int rollCount;
 	
-	@javax.persistence.Column(name = "announcement", nullable = true)
-	private Integer announcement;
+	@ManyToOne
+	@JoinColumn(name = "announcement_id", referencedColumnName = "id", nullable = true)
+	private BoxType announcement;
 
 	public int getId() {
 		return id;
@@ -54,29 +56,29 @@ public class Form {
 		this.id = id;
 	}
 
-	public User getUser() {
+	public AuthUser getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(AuthUser user) {
 		this.user = user;
 	}
 
-	public List<Column> getColumns() {
-		Collections.sort(columns, (a, b) -> a.getColumnType().ordinal() < b.getColumnType().ordinal() ? -1 : a.getColumnType().ordinal() == b.getColumnType().ordinal() ? 0 : 1);
+	public List<GameColumn> getColumns() {
+		Collections.sort(columns, (a, b) -> a.getColumnType().getId() < b.getColumnType().getId() ? -1 : a.getColumnType().getId() == b.getColumnType().getId() ? 0 : 1);
 		return columns;
 	}
 
-	public void setColumns(List<Column> columns) {
+	public void setColumns(List<GameColumn> columns) {
 		this.columns = columns;
 	}
 
-	public List<Dice> getDice() {
+	public List<GameDice> getDice() {
 		Collections.sort(dice, (a, b) -> a.getOrdinalNumber() < b.getOrdinalNumber() ? -1 : a.getOrdinalNumber() == b.getOrdinalNumber() ? 0 : 1);
 		return dice;
 	}
 
-	public void setDice(List<Dice> dice) {
+	public void setDice(List<GameDice> dice) {
 		this.dice = dice;
 	}
 
@@ -88,18 +90,18 @@ public class Form {
 		this.rollCount = rollCount;
 	}
 
-	public Integer getAnnouncement() {
+	public BoxType getAnnouncement() {
 		return announcement;
 	}
 
-	public void setAnnouncement(Integer announcement) {
+	public void setAnnouncement(BoxType announcement) {
 		this.announcement = announcement;
 	}
-	
-	public Column getColumnByType(ColumnType columnType) {
-		Column column = new Column();
-		for (Column fc : columns) {
-			if (fc.getColumnType() == columnType) {
+
+	public GameColumn getColumnByTypeId(int columnTypeId) {
+		GameColumn column = new GameColumn();
+		for (GameColumn fc : columns) {
+			if (fc.getColumnType().getId() == columnTypeId) {
 				column = fc;
 				break;
 			}
@@ -107,9 +109,9 @@ public class Form {
 		return column;
 	}
 
-	public Dice getDiceByOrdinalNumber(int ordinalNumber) {
-		Dice newDice = new Dice();
-		for (Dice d : dice) {
+	public GameDice getDiceByOrdinalNumber(int ordinalNumber) {
+		GameDice newDice = new GameDice();
+		for (GameDice d : dice) {
 			if (d.getOrdinalNumber() == ordinalNumber) newDice = d;
 			break;
 		}
@@ -118,10 +120,19 @@ public class Form {
 
 	public int calculateFinalSum() {
 		int finalSum = 0;
-		for (Column column : columns) {
+		for (GameColumn column : columns) {
 			finalSum += column.calculateSum();
 		}
 		return finalSum;
+	}
+
+	@JsonIgnore
+	public boolean isCompleted() {
+		for (GameColumn column : columns) {
+			if (!column.isCompleted())
+				return false;
+		}
+		return true;
 	}
 
 	public Map<String, Integer> calculateSums() {
@@ -130,7 +141,7 @@ public class Form {
 		sums.put("numberSum", 0);
 		sums.put("diffSum", 0);
 		sums.put("labelSum", 0);
-		for (Column column : columns) {
+		for (GameColumn column : columns) {
 			columnSums = column.calculateSums();
 			columnSums.forEach((k, v) -> sums.put(column.getColumnType().toString() + "-" + k, v));
 			sums.replace("numberSum", sums.get("numberSum") + columnSums.get("numberSum"));
@@ -141,10 +152,11 @@ public class Form {
 		return sums;
 	}
 
-	public boolean checkAnnouncementRequired() {
-		boolean announcementRequired = (announcement == null);
-		for (Column column : columns) {
-			if (column.getColumnType() != ColumnType.ANNOUNCEMENT) {
+	@JsonIgnore
+	public boolean isAnnouncementRequired() {
+		boolean announcementRequired = true;
+		for (GameColumn column : columns) {
+			if (!column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
 				if (!column.isCompleted()) {
 					announcementRequired = false;
 					break;
@@ -158,11 +170,11 @@ public class Form {
 	public String toString() {
 		String string = "User: " + user;
 		string += "\nColumns:\n";
-		for (Column column : columns) {
+		for (GameColumn column : columns) {
 			string += column + "\n";
 		}
 		string += "\nDice:";
-		for (Dice d : dice) {
+		for (GameDice d : dice) {
 			string += d + " ";
 		}
 		return string;

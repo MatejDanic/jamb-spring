@@ -2,6 +2,7 @@ package matej.models;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -10,39 +11,40 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import matej.models.composite.BoxId;
-import matej.models.enums.BoxType;
+import matej.models.keys.BoxId;
+import matej.models.types.BoxType;
 import matej.utils.ScoreUtil;
 
 @Entity
-@Table(name = "box")
+@Table(name = "game_box")
 @IdClass(BoxId.class)
-public class Box {
+public class GameBox {
 
 	@Id
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "form_id", referencedColumnName = "form_id", nullable = false),
-				  @JoinColumn(name = "column_type", referencedColumnName = "column_type", nullable = false) })
-	private Column column;
+				  @JoinColumn(name = "column_type_id", referencedColumnName = "column_type", nullable = false) })
+	private GameColumn column;
 
 	@Id
-	@javax.persistence.Column(name = "box_type")
+	@ManyToOne
+	@JoinColumn(name = "box_type_id", referencedColumnName = "id", nullable = false)
 	private BoxType boxType;
 
-	@javax.persistence.Column(name = "value")
+	@Column(name = "value")
 	private int value;
 
-	@javax.persistence.Column(name = "filled")
+	@Column(name = "filled")
 	private boolean filled;
 
-	@javax.persistence.Column(name = "available")
+	@Column(name = "available")
 	private boolean available;
 
-	public Column getColumn() {
+	public GameColumn getColumn() {
 		return column;
 	}
 
-	public void setColumn(Column column) {
+	public void setColumn(GameColumn column) {
 		this.column = column;
 	}
 
@@ -78,7 +80,7 @@ public class Box {
 		this.available = available;
 	}
 
-	public int fill(List<Dice> diceList) {
+	public int fill(List<GameDice> diceList) {
 		value = ScoreUtil.calculateScore(diceList, boxType);
 		filled = true;
 		available = false;
@@ -87,6 +89,6 @@ public class Box {
 
 	@Override
 	public String toString() {
-		return boxType + ": " + value + "(filled-" + filled + ", available-" + available + ")";
+		return boxType + ": " + value + " (FILLED-" + filled + ", AVAILABLE-" + available + ")";
 	}
 }

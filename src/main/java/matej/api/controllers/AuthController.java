@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import matej.models.Role;
-import matej.models.User;
+import matej.models.AuthRole;
+import matej.models.AuthUser;
 import matej.payload.request.LoginRequest;
 import matej.payload.request.RegisterRequest;
 import matej.payload.response.JwtResponse;
@@ -81,32 +81,32 @@ public class AuthController {
 		if (userRepo.existsByUsername(registerRequest.getUsername())) {
 			return ResponseEntity
 			.badRequest()
-			.body(new MessageResponse("Error: Username is already taken!"));
+			.body(new MessageResponse("Greška: Korisničko ime je već zauzeto!"));
 		}
 		
 		// Create new user's account
-		User user = new User(registerRequest.getUsername(),
+		AuthUser user = new AuthUser(registerRequest.getUsername(),
 		encoder.encode(registerRequest.getPassword()));
 		
 		Set<String> strRoles = registerRequest.getRole();
-		Set<Role> roles = new HashSet<>();
+		Set<AuthRole> roles = new HashSet<>();
 		
 		if (strRoles == null) {
-			Role userRole = roleRepo.findByLabel("USER")
-			.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+			AuthRole userRole = roleRepo.findByLabel("USER")
+			.orElseThrow(() -> new RuntimeException("Greška: Uloga nije pronađena."));
 			roles.add(userRole);
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
 					case "admin":
-					Role adminRole = roleRepo.findByLabel("ADMIN")
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					AuthRole adminRole = roleRepo.findByLabel("ADMIN")
+					.orElseThrow(() -> new RuntimeException("Greška: Admin uloga nije pronađena."));
 					roles.add(adminRole);
 					
 					break;
 					default:
-					Role userRole = roleRepo.findByLabel("USER")
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					AuthRole userRole = roleRepo.findByLabel("USER")
+					.orElseThrow(() -> new RuntimeException("Greška: Uloga nije pronađena."));
 					roles.add(userRole);
 				}
 			});
@@ -115,6 +115,6 @@ public class AuthController {
 		user.setRoles(roles);
 		userRepo.save(user);
 		
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity.ok(new MessageResponse("Korisnik uspješno registriran!"));
 	}
 }

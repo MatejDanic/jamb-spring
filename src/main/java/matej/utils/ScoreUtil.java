@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import matej.constants.JambConstants;
-import matej.models.Dice;
-import matej.models.enums.BoxType;
+import matej.constants.GameConstants;
+import matej.models.GameDice;
+import matej.models.types.BoxType;
 
 /**
  * This utility class contains static methods used calculating scores based on
@@ -25,38 +25,39 @@ public final class ScoreUtil {
 	 * @param boxType  the type of box to be filled
 	 * @return {@code int} the calculated score result
 	 */
-	public static int calculateScore(List<Dice> diceList, BoxType boxType) {
+	public static int calculateScore(List<GameDice> diceList, BoxType boxType) {
 		int result = 0; // initialize variable for storing and returning score result to zero
 		List<Integer> diceValues = new ArrayList<>(diceList.size());
 		diceList.forEach((dice) -> diceValues.add(dice.getValue()));
-		switch (boxType) { // determine method to be used for score calculation based on type of box to be
-							// filled
-			case ONES:
-			case TWOS:
-			case THREES:
-			case FOURS:
-			case FIVES:
-			case SIXES:
+		switch (boxType.getLabel()) { 
+			// determine method to be used for score calculation based on type of box to be
+			// filled
+			case "ONES":
+			case "TWOS":
+			case "THREES":
+			case "FOURS":
+			case "FIVES":
+			case "SIXES":
 				result = calculateSumByType(diceValues, boxType);
 				break;
-			case MAX:
-			case MIN:
+			case "MAX":
+			case "MIN":
 				result = calculateSum(diceValues);
 				break;
-			case TRIPS:
-				result = calculateSumOfRepeatingValue(diceValues, 3, JambConstants.BONUS_TRIPS);
+			case "TRIPS":
+				result = calculateSumOfRepeatingValue(diceValues, 3, GameConstants.BONUS_TRIPS);
 				break;
-			case STRAIGHT:
+			case "STRAIGHT":
 				result = calculateStraight(diceValues);
 				break;
-			case FULL:
-				result = calculateFull(diceValues, JambConstants.BONUS_FULL);
+			case "FULL":
+				result = calculateFull(diceValues, GameConstants.BONUS_FULL);
 				break;
-			case POKER:
-				result = calculateSumOfRepeatingValue(diceValues, 4, JambConstants.BONUS_POKER);
+			case "POKER":
+				result = calculateSumOfRepeatingValue(diceValues, 4, GameConstants.BONUS_POKER);
 				break;
-			case JAMB:
-				result = calculateSumOfRepeatingValue(diceValues, 5, JambConstants.BONUS_JAMB);
+			case "JAMB":
+				result = calculateSumOfRepeatingValue(diceValues, 5, GameConstants.BONUS_JAMB);
 				break;
 		}
 		return result;
@@ -84,9 +85,9 @@ public final class ScoreUtil {
 	 */
 	public static int calculateSumByType(List<Integer> diceValues, BoxType boxType) {
 		int sum = 0;
-		int type = boxType.ordinal() + 1; // type of box is by 1 larger than boxType ordinal because ordinals start at 0
 		for (int value : diceValues) {
-			if (value == type) {
+			int boxTypeId = boxType.getId(); // boxType id matches first six boxes by representing number ("ONES" -> Id: 1, "TWOS" -> Id: 2, ... , "SIXES" -> Id: 6)
+			if (value == boxTypeId) {
 				sum += value; // if dice value is equal to box type add to sum
 			}
 		}
@@ -131,9 +132,9 @@ public final class ScoreUtil {
 		straight.add(5);
 		if (diceValues.containsAll(straight)) {
 			if (diceValues.contains(1)) {
-				return JambConstants.BONUS_STRAIGHT_SMALL;
+				return GameConstants.BONUS_STRAIGHT_SMALL;
 			} else if (diceValues.contains(6))
-				return JambConstants.BONUS_STRAIGHT_BIG;
+				return GameConstants.BONUS_STRAIGHT_BIG;
 		}
 		return 0;
 	}

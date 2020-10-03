@@ -1,9 +1,9 @@
-package matej.models.composite;
+package matej.models.keys;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-import matej.models.Form;
+import matej.models.GameForm;
 
 public class DiceId implements Serializable {
 
@@ -12,13 +12,13 @@ public class DiceId implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private Form form;
+	private GameForm form;
 	
 	private int ordinalNumber;
 	
 	public DiceId() {}
  
-    public DiceId(Form form, int ordinalNumber) {
+    public DiceId(GameForm form, int ordinalNumber) {
         this.form = form;
         this.ordinalNumber = ordinalNumber;
     }

@@ -2,17 +2,14 @@ package matej.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "auth_role")
-public class Role {
+public class AuthRole {
     
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	@Column(name = "label")
@@ -21,10 +18,11 @@ public class Role {
 	@Column(name = "description")
     private String description;
 
-    public Role() {
+    public AuthRole() {
     }
 
-    public Role(String label) {
+    public AuthRole(int id, String label) {
+        this.id = id;
         this.label = label;
     }
 

@@ -8,23 +8,24 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import matej.api.repositories.BoxRepository;
+import matej.api.repositories.BoxTypeRepository;
 import matej.api.repositories.ColumnRepository;
+import matej.api.repositories.ColumnTypeRepository;
 import matej.api.repositories.DiceRepository;
 import matej.api.repositories.FormRepository;
 import matej.api.repositories.ScoreRepository;
 import matej.api.repositories.UserRepository;
-import matej.constants.JambConstants;
+import matej.constants.GameConstants;
 import matej.exceptions.IllegalMoveException;
 import matej.exceptions.InvalidOwnershipException;
-import matej.factories.JambFactory;
-import matej.models.Box;
-import matej.models.Dice;
-import matej.models.Form;
-import matej.models.Column;
-import matej.models.Score;
-import matej.models.User;
-import matej.models.enums.BoxType;
-import matej.models.enums.ColumnType;
+import matej.factories.GameFactory;
+import matej.models.GameBox;
+import matej.models.GameDice;
+import matej.models.GameForm;
+import matej.models.GameColumn;
+import matej.models.GameScore;
+import matej.models.types.BoxType;
+import matej.models.AuthUser;
 
 /**
  * Service Class for managing {@link Form} repostiory
@@ -46,7 +47,13 @@ public class FormService {
 	ColumnRepository columnRepo;
 
 	@Autowired
+	ColumnTypeRepository columnTypeRepo;
+
+	@Autowired
 	BoxRepository boxRepo;
+
+	@Autowired
+	BoxTypeRepository boxTypeRepo;
 
 	@Autowired
 	DiceRepository diceRepo;
@@ -63,12 +70,14 @@ public class FormService {
 	 * 
 	 * @throws UsernameNotFoundException if user with given username does not exist
 	 */
-	public Form initializeForm(String username) throws UsernameNotFoundException {
-		User user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+	public GameForm initializeForm(String username) throws UsernameNotFoundException {
+		AuthUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		if (user.getForm() != null) {
+			// System.out.println(formRepo.findById(user.getForm().getId()).get());
 			return formRepo.findById(user.getForm().getId()).get();
 		} else {
-			Form form = JambFactory.createForm(user);
+			GameForm form = GameFactory.createForm(user, columnTypeRepo.findAll(), boxTypeRepo.findAll());
+			// System.out.println(form);
 			return formRepo.save(form);
 		}
 	}
@@ -86,49 +95,48 @@ public class FormService {
 		formRepo.deleteById(id);
 	}
 
-	public void deleteFormSaveScore(Form form, User user, int finalSum) {
-		Score score = JambFactory.createScore(user, finalSum);
+	public void saveScore(GameForm form, AuthUser user, int finalSum) {
+		GameScore score = GameFactory.createScore(user, finalSum);
 		scoreRepo.save(score);
-		formRepo.delete(form);
 	}
 
-	public Form getFormById(int id) {
+	public GameForm getFormById(int id) {
 		return formRepo.findById(id).get();
 	}
 
-	public Column getColumn(int id, int columnTypeOrdinal) {
-		return getFormById(id).getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
+	public GameColumn getColumn(int id, int columnTypeId) {
+		return getFormById(id).getColumnByTypeId(columnTypeId);
 	}
 
-	public Box getColumnBox(int id, int columnTypeOrdinal, int boxTypeOrdinal) {
-		return getFormById(id).getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal))
-				.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
+	public GameBox getColumnBox(int id, int columnTypeId, int boxTypeId) {
+		return getFormById(id).getColumnByTypeId(columnTypeId)
+				.getBoxByTypeId(boxTypeId);
 	}
 
-	public List<Form> getFormList() {
+	public List<GameForm> getFormList() {
 		return formRepo.findAll();
 	}
 
-	public List<Dice> rollDice(String username, int id, Map<Integer, Boolean> diceToThrow)
+	public List<GameDice> rollDice(String username, int id, Map<Integer, Boolean> diceToThrow)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
-		Form form = getFormById(id);
+			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
+		GameForm form = getFormById(id);
 
 		if (form.getRollCount() == 0)
 			diceToThrow.replaceAll((k, v) -> v = true);
-		else if (form.getRollCount() == JambConstants.NUM_OF_ROLLS)
-			throw new IllegalMoveException("Dice roll limit reached!");
-		else if (form.getRollCount() > 0 && form.checkAnnouncementRequired() && form.getAnnouncement() == null)
-			throw new IllegalMoveException("Announcement is required!");
+		else if (form.getRollCount() == GameConstants.NUM_OF_ROLLS)
+			throw new IllegalMoveException("Kocka je bačena maksimalni broj puta!");
+		else if (form.getRollCount() == 1 && form.isAnnouncementRequired() && form.getAnnouncement() == null)
+			throw new IllegalMoveException("Najava je obavezna!");
 
-		if (form.getRollCount() < JambConstants.NUM_OF_ROLLS) {
+		if (form.getRollCount() < GameConstants.NUM_OF_ROLLS) {
 			form.setRollCount(form.getRollCount() + 1);
 			formRepo.save(form);
 		}
-		List<Dice> dice = form.getDice();
+		List<GameDice> dice = form.getDice();
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
-			for (Dice d : dice) {
+			for (GameDice d : dice) {
 				if (entry.getKey() == d.getOrdinalNumber()) {
 					if (entry.getValue()) d.roll();
 					break;
@@ -140,51 +148,51 @@ public class FormService {
 		return form.getDice();
 	}
 
-	public int announce(String username, int id, int announcementOrdinal)
+	public BoxType announce(String username, int formId, BoxType boxType)
 			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+		if (!checkOwnership(username, formId))
+			throw new InvalidOwnershipException("Forma s id-em " + formId + " ne pripada korisniku " + username + ".");
 
-		Form form = getFormById(id);
+		GameForm form = getFormById(formId);
 
 		if (form.getAnnouncement() != null)
-			throw new IllegalMoveException("Announcement already declared!");
+			throw new IllegalMoveException("Najava je već iskorištena!");
 		if (form.getRollCount() >= 2)
-			throw new IllegalMoveException("Announcement unavailable after second roll!");
-
-		form.setAnnouncement(announcementOrdinal);
+			throw new IllegalMoveException("Najava nije dostupna nakon drugog bacanja!");
+		
+		form.setAnnouncement(boxType);
 		formRepo.save(form);
-		return announcementOrdinal;
+		return boxType;
 	}
 
-	public int fillBox(String username, int id, int columnTypeOrdinal, int boxTypeOrdinal)
+	public int fillBox(String username, int id, int columnTypeId, int boxTypeId)
 			throws IllegalMoveException, InvalidOwnershipException {
 		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
+			throw new InvalidOwnershipException("Form s id-em " + id + " ne pripada korisniku " + username + ".");
 
-		User user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
-		Form form = getFormById(id);
-		Column column = form.getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
-		Box box = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
+		AuthUser user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
+		GameForm form = getFormById(id);
+		GameColumn column = form.getColumnByTypeId(columnTypeId);
+		GameBox box = column.getBoxByTypeId(boxTypeId);
 
 		if (box.isFilled())
-			throw new IllegalMoveException("Box already filled!");
+			throw new IllegalMoveException("Kućica već popunjena!");
 		else if (form.getRollCount() == 0)
-			throw new IllegalMoveException("Cannot fill box without rolling dice!");
-		else if (!box.isAvailable() && BoxType.fromOrdinal(form.getAnnouncement()) == null)
-			throw new IllegalMoveException("Box is currently not available!");
-		else if (form.getAnnouncement() != null && BoxType.fromOrdinal(form.getAnnouncement()) != box.getBoxType())
-			throw new IllegalMoveException("Box is not the same as announcement!");
+			throw new IllegalMoveException("Ne može se upisati kućica bez bacanja kocki!");
+		else if (!box.isAvailable())
+			throw new IllegalMoveException("Kućica nije dostupna!");
+		else if (form.getAnnouncement() != null && form.getAnnouncement().getId() != box.getBoxType().getId())
+			throw new IllegalMoveException("Kućica nije jednaka najavi!");
 
 		box.fill(form.getDice());
 		box.setColumn(column);
 
-		advanceColumn(form, columnTypeOrdinal, boxTypeOrdinal);
+		advanceColumn(form, columnTypeId, boxTypeId);
 		column.setForm(form);
 
-		if (isFormCompleted(form)) {
-			deleteFormSaveScore(form, user, form.calculateFinalSum());
+		if (form.isCompleted()) {
+			saveScore(form, user, form.calculateFinalSum());
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
@@ -193,32 +201,17 @@ public class FormService {
 		return box.getValue();
 	}
 
-	public Map<String, Integer> getSums(String username, int id) throws InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form with id " + id + " doesn't belong to user " + username);
-		Form form = getFormById(id);
-		return form.calculateSums();
-	}
-
-	private boolean isFormCompleted(Form form) {
-		for (Column column : form.getColumns()) {
-			if (!column.isCompleted())
-				return false;
-		}
-		return true;
-	}
-
-	public void advanceColumn(Form form, int columnTypeOrdinal, int boxTypeOrdinal) {
-		Column column = form.getColumnByType(ColumnType.fromOrdinal(columnTypeOrdinal));
-		if (column.getColumnType() == ColumnType.DOWNWARDS) {
-			boxTypeOrdinal++;
-		} else if (column.getColumnType() == ColumnType.UPWARDS) {
-			boxTypeOrdinal--;
+	public void advanceColumn(GameForm form, int columnTypeId, int boxTypeId) {
+		GameColumn column = form.getColumnByTypeId(columnTypeId);
+		if (column.getColumnType().getLabel().equals("DOWNWARDS")) {
+			boxTypeId++;
+		} else if (column.getColumnType().getLabel().equals("UPWARDS")) {
+			boxTypeId--;
 		} else {
 			return;
 		}
 		try {
-			Box nextBox = column.getBoxByType(BoxType.fromOrdinal(boxTypeOrdinal));
+			GameBox nextBox = column.getBoxByTypeId(boxTypeId);
 			nextBox.setAvailable(true);
 			formRepo.save(form);
 		} catch (IndexOutOfBoundsException e) {
@@ -227,8 +220,8 @@ public class FormService {
 	}
 
 	private boolean checkOwnership(String username, int formId) {
-		User user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		AuthUser user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		return user.getForm().getId() == formId;
 	}
 

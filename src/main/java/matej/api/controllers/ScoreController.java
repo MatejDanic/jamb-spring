@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.ScoreService;
-import matej.constants.JambConstants;
-import matej.models.Score;
+import matej.constants.GameConstants;
+import matej.models.GameScore;
 
 
 @RestController
@@ -26,12 +26,12 @@ public class ScoreController {
     ScoreService scoreService;
 
     @GetMapping("")
-	public List<Score> getScores() {
+	public List<GameScore> getScores() {
 		return scoreService.getScores();
 	}
 	
     @GetMapping("/{id}")
-	public Score getScoreById(@PathVariable int id) {
+	public GameScore getScoreById(@PathVariable int id) {
 		return scoreService.getScoreById(id);
 	}
 
@@ -43,7 +43,7 @@ public class ScoreController {
 	
 	@GetMapping("/scoreboard")
 	public List<Map<String, String>> getScoreboard() {
-		return scoreService.getScoreboard(JambConstants.LEADERBOARD_LIMIT);
+		return scoreService.getScoreboard(GameConstants.LEADERBOARD_LIMIT);
 	}
 	
 	@GetMapping("/leader")

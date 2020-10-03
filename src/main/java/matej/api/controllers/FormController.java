@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 import matej.api.services.FormService;
 import matej.exceptions.IllegalMoveException;
 import matej.exceptions.InvalidOwnershipException;
-import matej.models.Box;
-import matej.models.Dice;
-import matej.models.Form;
-import matej.models.Column;
-import matej.models.enums.BoxType;
-import matej.models.enums.ColumnType;
+import matej.models.GameBox;
+import matej.models.GameDice;
+import matej.models.GameForm;
+import matej.models.types.BoxType;
+import matej.models.GameColumn;
 import matej.security.jwt.JwtUtils;
 
 @RestController
@@ -56,46 +55,46 @@ public class FormController {
 		}
 	}
 
-	@PutMapping("/{id}/roll")
+	@PutMapping("/{formId}/roll")
 	public ResponseEntity<Object> rollDice(@RequestHeader(value = "Authorization") String headerAuth,
-			@PathVariable(value = "id") int id, @RequestBody Map<Integer, Boolean> diceToThrow) {
+			@PathVariable(value = "formId") int formId, @RequestBody Map<Integer, Boolean> diceToThrow) {
 		try {
 			return new ResponseEntity<>(
-					formService.rollDice(jwtUtils.getUsernameFromHeader(headerAuth), id, diceToThrow), HttpStatus.OK);
+					formService.rollDice(jwtUtils.getUsernameFromHeader(headerAuth), formId, diceToThrow), HttpStatus.OK);
 		} catch (InvalidOwnershipException | IllegalMoveException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	@PutMapping("/{id}/announce")
+	@PutMapping("/{formId}/announce")
 	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth,
-			@PathVariable(value = "id") int id, @RequestBody int announcementOrdinal) {
+			@PathVariable(value = "formId") int formId, @RequestBody BoxType boxType) {
 		try {
 			return new ResponseEntity<>(
-					formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, announcementOrdinal),
+					formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), formId, boxType),
 					HttpStatus.OK);
 		} catch (IllegalMoveException | InvalidOwnershipException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	@PutMapping("/{id}/columns/{columnTypeOrdinal}/boxes/{boxTypeOrdinal}/fill")
+	@PutMapping("/{formId}/columns/{columnTypeId}/boxes/{boxTypeId}/fill")
 	public ResponseEntity<Object> fillBox(@RequestHeader(value = "Authorization") String headerAuth,
-			@PathVariable(value = "id") int id, @PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal,
-			@PathVariable(value = "boxTypeOrdinal") int boxTypeOrdinal) {
+			@PathVariable(value = "formId") int formId, @PathVariable(value = "columnTypeId") int columnTypeId,
+			@PathVariable(value = "boxTypeId") int boxTypeId) {
 		try {
-			return new ResponseEntity<>(formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id,
-					columnTypeOrdinal, boxTypeOrdinal), HttpStatus.OK);
+			return new ResponseEntity<>(formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), formId,
+					columnTypeId, boxTypeId), HttpStatus.OK);
 		} catch (IllegalMoveException | InvalidOwnershipException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{formId}")
 	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth,
-			@PathVariable(value = "id") int id) throws InvalidOwnershipException {
+			@PathVariable(value = "formId") int formId) throws InvalidOwnershipException {
 		try {
-			formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id);
+			formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), formId);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (UsernameNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -104,48 +103,48 @@ public class FormController {
 
 	@GetMapping("")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Form> getFormList() {
+	public List<GameForm> getFormList() {
 		return formService.getFormList();
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/{formId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public Form getFormById(@PathVariable(value = "id") int id) {
-		return formService.getFormById(id);
+	public GameForm getFormById(@PathVariable(value = "formId") int formId) {
+		return formService.getFormById(formId);
 	}
 
-	@GetMapping("/{id}/columns")
+	@GetMapping("/{formId}/columns")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Column> getFormColumns(@PathVariable(value = "id") int id) {
-		return formService.getFormById(id).getColumns();
+	public List<GameColumn> getFormColumns(@PathVariable(value = "formId") int formId) {
+		return formService.getFormById(formId).getColumns();
 	}
 
-	@GetMapping("/{id}/columns/{columnTypeOrdinal}")
+	@GetMapping("/{formId}/columns/{columnTypeId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public Column getFormColumnByType(@PathVariable(value = "id") int id,
-			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal) {
-		return formService.getFormById(id).getColumnByType(ColumnType.values()[columnTypeOrdinal]);
+	public GameColumn getFormColumnByType(@PathVariable(value = "formId") int formId,
+			@PathVariable(value = "columnTypeId") int columnTypeId) {
+		return formService.getFormById(formId).getColumnByTypeId(columnTypeId);
 	}
 
-	@GetMapping("/{id}/columns/{columnTypeOrdinal}/boxes")
+	@GetMapping("/{formId}/columns/{columnTypeId}/boxes")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Box> getFormColumnBoxes(@PathVariable(value = "id") int id,
-			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal) {
-		return formService.getFormById(id).getColumnByType(ColumnType.values()[columnTypeOrdinal]).getBoxes();
+	public List<GameBox> getFormColumnBoxes(@PathVariable(value = "formId") int formId,
+			@PathVariable(value = "columnTypeId") int columnTypeId) {
+		return formService.getFormById(formId).getColumnByTypeId(columnTypeId).getBoxes();
 	}
 
-	@GetMapping("/{id}/columns/{columnTypeOrdinal}/boxes/{boxTypeOrdinal}")
+	@GetMapping("/{formId}/columns/{columnTypeId}/boxes/{boxTypeId}")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public Box getFormColumnBoxBoxByType(@PathVariable(value = "id") int id,
-			@PathVariable(value = "columnTypeOrdinal") int columnTypeOrdinal,
-			@PathVariable(value = "boxTypeOrdinal") int boxTypeOrdinal) {
-		return formService.getFormById(id).getColumnByType(ColumnType.values()[columnTypeOrdinal])
-				.getBoxByType(BoxType.values()[boxTypeOrdinal]);
+	public GameBox getFormColumnBoxBoxByType(@PathVariable(value = "formId") int formId,
+			@PathVariable(value = "columnTypeId") int columnTypeId,
+			@PathVariable(value = "boxTypeId") int boxTypeId) {
+		return formService.getFormById(formId).getColumnByTypeId(columnTypeId)
+				.getBoxByTypeId(boxTypeId);
 	}
 
-	@GetMapping("/{id}/dice")
+	@GetMapping("/{formId}/dice")
 	@PreAuthorize("hasAuthority('ADMIN')")
-	public List<Dice> getFormDice(@PathVariable(value = "id") int id) {
-		return formService.getFormById(id).getDice();
+	public List<GameDice> getFormDice(@PathVariable(value = "formId") int formId) {
+		return formService.getFormById(formId).getDice();
 	}
 }

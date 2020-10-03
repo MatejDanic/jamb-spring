@@ -2,8 +2,8 @@ package matej.api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import matej.models.Form;
+import matej.models.GameForm;
 
-public interface FormRepository extends JpaRepository<Form, Integer> {
+public interface FormRepository extends JpaRepository<GameForm, Integer> {
 	
 }

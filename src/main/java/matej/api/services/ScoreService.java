@@ -15,11 +15,11 @@ import org.springframework.stereotype.Service;
 
 import matej.api.repositories.ScoreRepository;
 import matej.api.repositories.UserRepository;
-import matej.models.Score;
+import matej.models.GameScore;
 import matej.utils.DateUtil;
 
 /**
- * Service Class for managing {@link Score} repostiory
+ * Service Class for managing {@link GameScore} repostiory
  *
  * @author MatejDanic
  * @version 1.0
@@ -34,11 +34,11 @@ public class ScoreService {
 	@Autowired
 	UserRepository userRepo;
 
-	public List<Score> getScores() {
+	public List<GameScore> getScores() {
 		return scoreRepo.findAll();
 	}
 
-	public Score getScoreById(int id) {
+	public GameScore getScoreById(int id) {
 		return scoreRepo.findById(id).get();
 	}
 
@@ -48,8 +48,8 @@ public class ScoreService {
 
 	public List<Map<String, String>> getScoreboard(int max) {
 		List<Map<String, String>> scoreboard = new ArrayList<>();
-		List<Score> scores = getCurrentWeekScores();
-		for (Score score : scores) {
+		List<GameScore> scores = getCurrentWeekScores();
+		for (GameScore score : scores) {
 			Map<String, String> scoreMap = new HashMap<>();
 			scoreMap.put("username", score.getUser().getUsername());
 			scoreMap.put("value", String.valueOf(score.getValue()));
@@ -62,22 +62,22 @@ public class ScoreService {
 
 	public String getCurrentWeekLeader() {
 		String leader = "";
-		List<Score> scores = getCurrentWeekScores();
+		List<GameScore> scores = getCurrentWeekScores();
 		if (scores.size() > 0) leader = scores.get(0).getUser().getUsername();
 		return leader;
 	}
 
 	public String getLastWeekLeader() {
 		String leader = "";
-		List<Score> scores = getLastWeekScores();
+		List<GameScore> scores = getLastWeekScores();
 		if (scores.size() > 0) leader = scores.get(0).getUser().getUsername();
 		return leader;
 	}
 
 
-	private List<Score> getCurrentWeekScores() {
-		List<Score> currentWeekScores = scoreRepo.findAll();
-		Queue<Score> queue = new LinkedList<>();
+	private List<GameScore> getCurrentWeekScores() {
+		List<GameScore> currentWeekScores = scoreRepo.findAll();
+		Queue<GameScore> queue = new LinkedList<>();
 		LocalDateTime today = LocalDateTime.now();
 		currentWeekScores.forEach(e -> {
 			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
@@ -85,18 +85,18 @@ public class ScoreService {
 			}
 		});
 		currentWeekScores.removeAll(queue);
-		Collections.sort(currentWeekScores, new Comparator<Score>() {
+		Collections.sort(currentWeekScores, new Comparator<GameScore>() {
 			@Override
-			public int compare(Score s1, Score s2) {
+			public int compare(GameScore s1, GameScore s2) {
 				return (s2.getValue() - s1.getValue());
 			}
 		});
 		return currentWeekScores;
 	}
 
-	private List<Score> getLastWeekScores() {
-		List<Score> currentWeekScores = scoreRepo.findAll();
-		Queue<Score> queue = new LinkedList<>();
+	private List<GameScore> getLastWeekScores() {
+		List<GameScore> currentWeekScores = scoreRepo.findAll();
+		Queue<GameScore> queue = new LinkedList<>();
 		LocalDateTime today = LocalDateTime.now();
 		currentWeekScores.forEach(e -> {
 			if (!(DateUtil.isSameWeek(e.getDate(), today))) {
@@ -104,9 +104,9 @@ public class ScoreService {
 			}
 		});
 		currentWeekScores.removeAll(queue);
-		Collections.sort(currentWeekScores, new Comparator<Score>() {
+		Collections.sort(currentWeekScores, new Comparator<GameScore>() {
 			@Override
-			public int compare(Score s1, Score s2) {
+			public int compare(GameScore s1, GameScore s2) {
 				return (s2.getValue() - s1.getValue());
 			}
 		});

@@ -2,8 +2,8 @@ package matej.api.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import matej.models.Dice;
+import matej.models.GameDice;
 
-public interface DiceRepository extends JpaRepository<Dice, Integer> {
+public interface DiceRepository extends JpaRepository<GameDice, Integer> {
 	
 }
