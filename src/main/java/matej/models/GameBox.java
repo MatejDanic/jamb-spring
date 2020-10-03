@@ -28,7 +28,7 @@ public class GameBox {
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "box_type_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "box_type", referencedColumnName = "id", nullable = false)
 	private BoxType boxType;
 
 	@Column(name = "value")
