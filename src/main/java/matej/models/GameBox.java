@@ -23,12 +23,12 @@ public class GameBox {
 	@Id
 	@ManyToOne
 	@JoinColumns({@JoinColumn(name = "form_id", referencedColumnName = "form_id", nullable = false),
-				  @JoinColumn(name = "column_type", referencedColumnName = "column_type", nullable = false) })
+				  @JoinColumn(name = "column_type_id", referencedColumnName = "column_type", nullable = false) })
 	private GameColumn column;
 
 	@Id
 	@ManyToOne
-	@JoinColumn(name = "box_type", referencedColumnName = "label", nullable = false)
+	@JoinColumn(name = "box_type_id", referencedColumnName = "id", nullable = false)
 	private BoxType boxType;
 
 	@Column(name = "value")

@@ -10,10 +10,10 @@ import javax.persistence.Table;
 @Table(name="column_type")
 public class ColumnType {
 
-	@Column(name = "id", unique = true, nullable = false)
+	@Id
 	private int id;
 	
-	@Id
+	
 	@Column(name = "label", nullable = false)
 	private String label;
 

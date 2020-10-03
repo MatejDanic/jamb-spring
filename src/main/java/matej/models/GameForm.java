@@ -45,7 +45,7 @@ public class GameForm {
 	private int rollCount;
 	
 	@ManyToOne
-	@JoinColumn(name = "announcement", referencedColumnName = "label", nullable = true)
+	@JoinColumn(name = "announcement_id", referencedColumnName = "id", nullable = true)
 	private BoxType announcement;
 
 	public int getId() {

@@ -30,7 +30,7 @@ public class Startup implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
 
         if (roleRepo.findAll().size() == 0) {
-            roleRepo.saveAll(Arrays.asList(new AuthRole("ADMIN"), new AuthRole("USER")));
+            roleRepo.saveAll(Arrays.asList(new AuthRole(1, "ADMIN"), new AuthRole(2, "USER")));
         }
 
         if (columnTypeRepo.findAll().size() == 0) {

@@ -30,22 +30,22 @@ public class AuthUser {
     private int id;
 
     @JsonIgnoreProperties("user")
-    @OneToMany(mappedBy="user", cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}) 
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE}) 
     private List<GameScore> scores;
 
     @JsonIgnore
-    @OneToOne(mappedBy="user", cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private GameForm form;
     
-    @Column(name="username", nullable=false, unique=true)
+    @Column(name = "username", nullable = false, unique = true)
     @Size(min = 3, max = 15)
     private String username;
     
     @JsonIgnore
-    @Column(name="password", nullable=false)
+    @Column(name = "password", nullable = false)
     private String password;
     
-    @ManyToMany(fetch=FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "auth_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<AuthRole> roles;
 

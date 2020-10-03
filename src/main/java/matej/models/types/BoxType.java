@@ -10,10 +10,10 @@ import javax.persistence.Table;
 @Table(name = "box_type")
 public class BoxType {
 
-	@Column(name = "id", unique = true, nullable = false)
+	@Id
 	private int id;
 
-	@Id
+	
 	@Column(name = "label", nullable = false)
 	private String label;
 
