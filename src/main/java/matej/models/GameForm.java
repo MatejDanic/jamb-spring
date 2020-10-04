@@ -1,8 +1,6 @@
 package matej.models;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -133,23 +131,6 @@ public class GameForm {
 				return false;
 		}
 		return true;
-	}
-
-	public Map<String, Integer> calculateSums() {
-		Map<String, Integer> sums = new HashMap<>();
-		Map<String, Integer> columnSums;
-		sums.put("numberSum", 0);
-		sums.put("diffSum", 0);
-		sums.put("labelSum", 0);
-		for (GameColumn column : columns) {
-			columnSums = column.calculateSums();
-			columnSums.forEach((k, v) -> sums.put(column.getColumnType().toString() + "-" + k, v));
-			sums.replace("numberSum", sums.get("numberSum") + columnSums.get("numberSum"));
-			sums.replace("diffSum", sums.get("diffSum") + columnSums.get("diffSum"));
-			sums.replace("labelSum", sums.get("labelSum") + columnSums.get("labelSum"));
-		}
-		sums.put("finalSum", sums.get("numberSum") + sums.get("diffSum") + sums.get("labelSum"));
-		return sums;
 	}
 
 	@JsonIgnore
