@@ -1,9 +1,7 @@
 package matej.models;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -108,9 +106,9 @@ public class GameColumn {
 				if (!box.isFilled())
 					diffReady = false;
 			}
-			if (box.getBoxType().getId() <= 5)
+			if (box.getBoxType().getId() <= 6)
 				numberSum += box.getValue();
-			else if (box.getBoxType().getId() >= 8)
+			else if (box.getBoxType().getId() >= 9)
 				labelSum += box.getValue();
 		}
 		if (numberSum >= GameConstants.NUMBERSUM_BONUS_THRESHOLD)
@@ -119,35 +117,6 @@ public class GameColumn {
 			diffSum = (getBoxByTypeLabel("MAX").getValue() - getBoxByTypeLabel("MIN").getValue())
 					* getBoxByTypeLabel("ONES").getValue();
 		return numberSum + diffSum + labelSum;
-	}
-
-	public Map<String, Integer> calculateSums() {
-		Map<String, Integer> sums = new HashMap<>();
-		sums.put("numberSum", 0);
-		sums.put("diffSum", 0);
-		sums.put("labelSum", 0);
-
-		boolean diffReady = true;
-		for (GameBox box : boxes) {
-			if (box.getBoxType().getLabel().equals("ONES") || box.getBoxType().getLabel().equals("MAX")
-					|| box.getBoxType().getLabel().equals("MIN")) {
-				if (!box.isFilled()) {
-					diffReady = false;
-				}
-			}
-			if (box.getBoxType().getId() <= 5) {
-				sums.replace("numberSum", sums.get("numberSum") + box.getValue());
-			} else if (box.getBoxType().getId() >= 8) {
-				sums.replace("labelSum", sums.get("labelSum") + box.getValue());
-			}
-		}
-		if (sums.get("numberSum") >= GameConstants.NUMBERSUM_BONUS_THRESHOLD)
-			sums.replace("numberSum", sums.get("numberSum") + GameConstants.NUMBERSUM_BONUS);
-		if (diffReady) {
-			sums.replace("diffSum", (getBoxByTypeLabel("MAX").getValue() - getBoxByTypeLabel("MIN").getValue())
-					* getBoxByTypeLabel("ONES").getValue());
-		}
-		return sums;
 	}
 	
 	@Override
