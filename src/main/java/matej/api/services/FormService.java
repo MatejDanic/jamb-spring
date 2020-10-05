@@ -86,17 +86,51 @@ public class FormService {
 	 * Deletes {@link Form} object from database repository.
 	 * 
 	 * @param username the username of the form owner
+	 * @param id the id of the form
 	 * 
-	 * @return {@link Form} the form that the game will be played on
-	 * 
-	 * @throws UsernameNotFoundException if user with given username does not exist
+	 * @throws InvalidOwnershipException if form does not belong to user
 	 */
 	public void deleteFormById(String username, int id) throws InvalidOwnershipException {
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
 		formRepo.deleteById(id);
 	}
 
-	public void saveScore(GameForm form, AuthUser user, int finalSum) {
-		GameScore score = GameFactory.createScore(user, finalSum);
+	/**
+	 * Deletes {@link Form} object from database repository.
+	 * 
+	 * @param username the username of the form owner
+	 * @param id the id of the form
+	 * 
+	 * @throws InvalidOwnershipException if form does not belong to user
+	 */
+	public void restartFormById(String username, int id) throws InvalidOwnershipException {
+		if (!checkOwnership(username, id))
+			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
+		GameForm form = getFormById(id);
+		form.setAnnouncement(null);
+		form.setRollCount(0);
+		for (GameColumn column : form.getColumns()) {
+			for (GameBox box : column.getBoxes()) {
+				box.setValue(0);
+				if (column.getColumnType().getLabel().equals("ANY_DIRECTION") || column.getColumnType().getLabel().equals("ANNOUNCEMENT"))
+					box.setAvailable(true);
+				else if (column.getColumnType().getLabel().equals("DOWNWARDS") && box.getBoxType().getLabel().equals("ONES"))
+					box.setAvailable(true);
+				else if (column.getColumnType().getLabel().equals("UPWARDS") && box.getBoxType().getLabel().equals("JAMB"))
+					box.setAvailable(true);
+				else box.setAvailable(false);
+				box.setFilled(false);
+			}
+		}
+		for (GameDice dice : form.getDice()) {
+			dice.setValue(6);
+		}
+		formRepo.save(form);
+	}
+
+	public void saveScore(AuthUser user, GameForm form) {
+		GameScore score = GameFactory.createScore(user, form.calculateFinalSum());
 		scoreRepo.save(score);
 	}
 
@@ -178,10 +212,10 @@ public class FormService {
 
 		if (box.isFilled())
 			throw new IllegalMoveException("Kućica već popunjena!");
-		else if (form.getRollCount() == 0)
-			throw new IllegalMoveException("Ne može se upisati kućica bez bacanja kocki!");
 		else if (!box.isAvailable())
 			throw new IllegalMoveException("Kućica nije dostupna!");
+		else if (form.getRollCount() == 0)
+			throw new IllegalMoveException("Ne može se upisati u kućicu bez bacanja kocki!");
 		else if (form.getAnnouncement() != null && form.getAnnouncement().getId() != box.getBoxType().getId())
 			throw new IllegalMoveException("Kućica nije jednaka najavi!");
 
@@ -192,7 +226,7 @@ public class FormService {
 		column.setForm(form);
 
 		if (form.isCompleted()) {
-			saveScore(form, user, form.calculateFinalSum());
+			saveScore(user, form);
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);

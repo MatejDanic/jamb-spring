@@ -156,7 +156,7 @@ public class GameForm {
 		}
 		string += "\nDice:";
 		for (GameDice d : dice) {
-			string += d + " ";
+			string += "\n" + d + " ";
 		}
 		return string;
 	}
