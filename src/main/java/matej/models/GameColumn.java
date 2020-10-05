@@ -100,16 +100,16 @@ public class GameColumn {
 		int diffSum = 0;
 		int labelSum = 0;
 		boolean diffReady = true;
-		for (GameBox box : boxes) {
-			if (box.getBoxType().getLabel().equals("ONES") || box.getBoxType().getLabel().equals("MAX")
-					|| box.getBoxType().getLabel().equals("MIN")) {
-				if (!box.isFilled())
-					diffReady = false;
-			}
+		for (GameBox box : boxes) {			
 			if (box.getBoxType().getId() <= 6)
 				numberSum += box.getValue();
 			else if (box.getBoxType().getId() >= 9)
 				labelSum += box.getValue();
+			if (box.getBoxType().getLabel().equals("ONES") || box.getBoxType().getLabel().equals("MAX")
+				|| box.getBoxType().getLabel().equals("MIN")) {
+			if (!box.isFilled())
+				diffReady = false;
+		}
 		}
 		if (numberSum >= GameConstants.NUMBERSUM_BONUS_THRESHOLD)
 			numberSum += GameConstants.NUMBERSUM_BONUS;

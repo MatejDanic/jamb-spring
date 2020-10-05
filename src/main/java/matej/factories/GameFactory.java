@@ -68,13 +68,13 @@ public class GameFactory {
 			GameBox box = new GameBox();
 			box.setColumn(column);
 			box.setBoxType(boxType);
-			if (column.getColumnType().getLabel().equals("ANY_DIRECTION") || column.getColumnType().getLabel().equals("ANNOUNCEMENT")) {
+			if (column.getColumnType().getLabel().equals("ANY_DIRECTION") || column.getColumnType().getLabel().equals("ANNOUNCEMENT"))
 				box.setAvailable(true);
-			}
 			else if (column.getColumnType().getLabel().equals("DOWNWARDS") && boxType.getLabel().equals("ONES"))
 				box.setAvailable(true);
 			else if (column.getColumnType().getLabel().equals("UPWARDS") && boxType.getLabel().equals("JAMB"))
 				box.setAvailable(true);
+			else box.setAvailable(false);
 			boxes.add(box);
 		}
 		return boxes;
