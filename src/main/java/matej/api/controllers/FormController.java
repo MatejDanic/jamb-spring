@@ -44,7 +44,6 @@ public class FormController {
 	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
 
 	@PutMapping("")
-	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
 		// if (!rateLimiter.tryAcquire(1)) return null;
 		try {
@@ -56,7 +55,6 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/roll")
-	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> rollDice(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody Map<Integer, Boolean> diceToThrow) {
 		try {
@@ -68,7 +66,6 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/announce")
-	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody BoxType boxType) {
 		try {
@@ -81,7 +78,6 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/columns/{columnTypeId}/boxes/{boxTypeId}/fill")
-	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> fillBox(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @PathVariable(value = "columnTypeId") int columnTypeId,
 			@PathVariable(value = "boxTypeId") int boxTypeId) {
@@ -106,7 +102,6 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/restart")
-	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> restartFormById(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id) {
 		try {
