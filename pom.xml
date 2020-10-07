@@ -94,6 +94,11 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
 			<artifactId>httpclient</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.2.32</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

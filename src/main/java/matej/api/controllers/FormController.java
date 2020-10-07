@@ -32,7 +32,6 @@ import matej.security.jwt.JwtUtils;
 
 @RestController
 @CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
-@PreAuthorize("isAuthenticated()")
 @RequestMapping("/forms")
 public class FormController {
 
@@ -45,6 +44,7 @@ public class FormController {
 	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
 
 	@PutMapping("")
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
 		// if (!rateLimiter.tryAcquire(1)) return null;
 		try {
@@ -56,6 +56,7 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/roll")
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> rollDice(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody Map<Integer, Boolean> diceToThrow) {
 		try {
@@ -67,6 +68,7 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/announce")
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody BoxType boxType) {
 		try {
@@ -79,6 +81,7 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/columns/{columnTypeId}/boxes/{boxTypeId}/fill")
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> fillBox(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @PathVariable(value = "columnTypeId") int columnTypeId,
 			@PathVariable(value = "boxTypeId") int boxTypeId) {
@@ -91,6 +94,7 @@ public class FormController {
 	}
 
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('ADMIN')")
 	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id) {
 		try {
@@ -102,6 +106,7 @@ public class FormController {
 	}
 
 	@PutMapping("/{id}/restart")
+	@PreAuthorize("hasAuthority('USER')")
 	public ResponseEntity<Object> restartFormById(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id) {
 		try {
@@ -113,39 +118,33 @@ public class FormController {
 	}
 
 	@GetMapping("")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<GameForm> getFormList() {
 		return formService.getFormList();
 	}
 
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public GameForm getFormById(@PathVariable(value = "id") int id) {
 		return formService.getFormById(id);
 	}
 
 	@GetMapping("/{id}/columns")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<GameColumn> getFormColumns(@PathVariable(value = "id") int id) {
 		return formService.getFormById(id).getColumns();
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeId}")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public GameColumn getFormColumnByType(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeId") int columnTypeId) {
 		return formService.getFormById(id).getColumnByTypeId(columnTypeId);
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeId}/boxes")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<GameBox> getFormColumnBoxes(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeId") int columnTypeId) {
 		return formService.getFormById(id).getColumnByTypeId(columnTypeId).getBoxes();
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeId}/boxes/{boxTypeId}")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public GameBox getFormColumnBoxBoxByType(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeId") int columnTypeId,
 			@PathVariable(value = "boxTypeId") int boxTypeId) {
@@ -154,7 +153,6 @@ public class FormController {
 	}
 
 	@GetMapping("/{id}/dice")
-	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<GameDice> getFormDice(@PathVariable(value = "id") int id) {
 		return formService.getFormById(id).getDice();
 	}
