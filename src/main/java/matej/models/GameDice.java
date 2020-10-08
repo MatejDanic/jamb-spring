@@ -10,10 +10,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import matej.models.keys.DiceId;
 
 @Entity
 @Table(name="game_dice")
+@RestResource(rel = "dice", path = "dice")
 @IdClass(DiceId.class)
 public class GameDice {
 

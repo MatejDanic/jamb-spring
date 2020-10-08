@@ -6,8 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 @Entity
-@Table(name="column_type")
+@Table(name = "column_type")
+@RestResource(rel = "column-types", path = "column-types")
 public class ColumnType {
 
 	@Id

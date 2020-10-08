@@ -15,12 +15,15 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import matej.constants.GameConstants;
 import matej.models.keys.ColumnId;
 import matej.models.types.ColumnType;
 
 @Entity
 @Table(name = "game_column")
+@RestResource(rel = "columns", path = "columns")
 @IdClass(ColumnId.class)
 public class GameColumn {
 

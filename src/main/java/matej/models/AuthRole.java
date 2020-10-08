@@ -5,8 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 @Entity
 @Table(name = "auth_role")
+@RestResource(rel = "roles", path = "roles")
 public class AuthRole {
     
     @Id

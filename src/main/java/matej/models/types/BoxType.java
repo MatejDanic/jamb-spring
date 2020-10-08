@@ -6,8 +6,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 @Entity
 @Table(name = "box_type")
+@RestResource(rel = "box-types", path = "box-types")
 public class BoxType {
 
 	@Id

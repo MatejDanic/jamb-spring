@@ -11,12 +11,15 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import matej.models.keys.BoxId;
 import matej.models.types.BoxType;
 import matej.utils.ScoreUtil;
 
 @Entity
 @Table(name = "game_box")
+@RestResource(rel = "boxes", path = "boxes")
 @IdClass(BoxId.class)
 public class GameBox {
 
