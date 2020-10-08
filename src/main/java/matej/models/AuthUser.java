@@ -21,8 +21,11 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 @Entity
 @Table(name = "auth_user")
+@RestResource(rel = "users", path = "users")
 public class AuthUser {
     
     @Id

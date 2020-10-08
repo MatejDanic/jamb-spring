@@ -13,8 +13,11 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 @Entity
 @Table(name="game_score")
+@RestResource(rel = "scores", path = "scores")
 public class GameScore {
 
 	@Id

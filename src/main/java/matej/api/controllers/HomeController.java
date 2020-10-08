@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("")
 public class HomeController {
 
-	@GetMapping("")
+	@GetMapping("/api")
 	public void home(HttpServletResponse response) {
 		try {
 			response.sendRedirect("/swagger-ui.html");
@@ -22,4 +22,5 @@ public class HomeController {
 			e.printStackTrace();
 		}
 	}
+
 }
