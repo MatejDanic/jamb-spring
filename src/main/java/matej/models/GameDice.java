@@ -10,6 +10,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import matej.models.keys.DiceId;
@@ -22,6 +24,7 @@ public class GameDice {
 
 	@Id
 	@ManyToOne
+    @JsonIgnore
 	@JoinColumn(name = "form_id", referencedColumnName = "id", nullable = false)
 	private GameForm form;
 	
