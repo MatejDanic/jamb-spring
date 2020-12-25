@@ -26,6 +26,7 @@ import matej.exceptions.InvalidOwnershipException;
 import matej.models.GameBox;
 import matej.models.GameDice;
 import matej.models.GameForm;
+import matej.models.MessageResponse;
 import matej.models.types.BoxType;
 import matej.models.GameColumn;
 import matej.security.jwt.JwtUtils;
@@ -50,7 +51,7 @@ public class FormController {
 			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)),
 					HttpStatus.OK);
 		} catch (UsernameNotFoundException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -61,7 +62,7 @@ public class FormController {
 			return new ResponseEntity<>(
 					formService.rollDice(jwtUtils.getUsernameFromHeader(headerAuth), id, diceToThrow), HttpStatus.OK);
 		} catch (InvalidOwnershipException | IllegalMoveException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -73,7 +74,7 @@ public class FormController {
 					formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, boxType),
 					HttpStatus.OK);
 		} catch (IllegalMoveException | InvalidOwnershipException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -85,7 +86,7 @@ public class FormController {
 			return new ResponseEntity<>(formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id,
 					columnTypeId, boxTypeId), HttpStatus.OK);
 		} catch (IllegalMoveException | InvalidOwnershipException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -97,7 +98,7 @@ public class FormController {
 			formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (InvalidOwnershipException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -108,7 +109,7 @@ public class FormController {
 			formService.restartFormById(jwtUtils.getUsernameFromHeader(headerAuth), id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (InvalidOwnershipException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -118,8 +119,13 @@ public class FormController {
 	}
 
 	@GetMapping("/{id}")
-	public GameForm getFormById(@PathVariable(value = "id") int id) {
-		return formService.getFormById(id);
+	public ResponseEntity<Object> getFormById(@PathVariable(value = "id") int id) {
+        try {
+            GameForm form = formService.getFormById(id);
+			return new ResponseEntity<>(form, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}/columns")

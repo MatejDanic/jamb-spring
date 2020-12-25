@@ -1,7 +1,7 @@
 package matej.models;
 
 
-public class MessageBean {
+public class MessageSocket {
 
     private String username;
     private int userId;

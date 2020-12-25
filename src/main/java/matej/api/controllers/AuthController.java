@@ -10,6 +10,7 @@ import javax.validation.Valid;
 // import com.google.common.util.concurrent.RateLimiter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,97 +25,91 @@ import org.springframework.web.bind.annotation.RestController;
 
 import matej.models.AuthRole;
 import matej.models.AuthUser;
+import matej.models.MessageResponse;
 import matej.payload.request.LoginRequest;
 import matej.payload.request.RegisterRequest;
 import matej.payload.response.JwtResponse;
-import matej.payload.response.MessageResponse;
 import matej.api.repositories.RoleRepository;
 import matej.api.repositories.UserRepository;
 import matej.security.jwt.JwtUtils;
 import matej.security.services.UserDetailsImpl;
 
 @RestController
-@CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
+@CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
 @RequestMapping("/auth")
 public class AuthController {
-	
-	@Autowired
-	AuthenticationManager authenticationManager;
-	
-	@Autowired
-	UserRepository userRepo;
-	
-	@Autowired
-	RoleRepository roleRepo;
-	
-	@Autowired
-	PasswordEncoder encoder;
-	
-	@Autowired
-	JwtUtils jwtUtils;
 
-	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
-	
-	@PostMapping("/login")
-	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-		
-		Authentication authentication = authenticationManager.authenticate(
-		new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-		
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = jwtUtils.generateJwtToken(authentication);
-		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-		List<String> roles = userDetails.getAuthorities().stream()
-		.map(item -> item.getAuthority())
-		.collect(Collectors.toList());
-		
-		return ResponseEntity.ok(new JwtResponse(jwt, 
-		userDetails.getId(), 
-		userDetails.getUsername(),
-		roles));
-	}
-	
-	@PostMapping("/register")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-		// if (!rateLimiter.tryAcquire(1)) return null;
-		if (userRepo.existsByUsername(registerRequest.getUsername())) {
-			return ResponseEntity
-			.badRequest()
-			.body(new MessageResponse("Greška: Korisničko ime je već zauzeto!"));
-		}
-		
-		// Create new user's account
-		AuthUser user = new AuthUser(registerRequest.getUsername(),
-		encoder.encode(registerRequest.getPassword()));
-		
-		Set<String> strRoles = registerRequest.getRole();
-		Set<AuthRole> roles = new HashSet<>();
-		
-		if (strRoles == null) {
-			AuthRole userRole = roleRepo.findByLabel("USER")
-			.orElseThrow(() -> new RuntimeException("Greška: Uloga nije pronađena."));
-			roles.add(userRole);
-		} else {
-			strRoles.forEach(role -> {
-				switch (role) {
-					case "admin":
-					AuthRole adminRole = roleRepo.findByLabel("ADMIN")
-					.orElseThrow(() -> new RuntimeException("Greška: Admin uloga nije pronađena."));
-					roles.add(adminRole);
-					
-					break;
-					default:
-					AuthRole userRole = roleRepo.findByLabel("USER")
-					.orElseThrow(() -> new RuntimeException("Greška: Uloga nije pronađena."));
-					roles.add(userRole);
-				}
-			});
-		}
-		
-		user.setRoles(roles);
-		userRepo.save(user);
-		
-		return ResponseEntity.ok(new MessageResponse("Korisnik uspješno registriran!"));
-	}
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    UserRepository userRepo;
+
+    @Autowired
+    RoleRepository roleRepo;
+
+    @Autowired
+    PasswordEncoder encoder;
+
+    @Autowired
+    JwtUtils jwtUtils;
+
+    // private final RateLimiter rateLimiter = RateLimiter.create(0.2);
+
+    @PostMapping("/login")
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles),
+                HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        // if (!rateLimiter.tryAcquire(1)) return null;
+        if (userRepo.existsByUsername(registerRequest.getUsername())) {
+            return new ResponseEntity<>(new MessageResponse("Korisničko ime je već zauzeto!"), HttpStatus.BAD_REQUEST);
+        }
+
+        // Create new user's account
+        AuthUser user = new AuthUser(registerRequest.getUsername(), encoder.encode(registerRequest.getPassword()));
+
+        Set<String> strRoles = registerRequest.getRole();
+        Set<AuthRole> roles = new HashSet<>();
+
+        if (strRoles == null) {
+            AuthRole userRole = roleRepo.findByLabel("USER")
+                    .orElseThrow(() -> new RuntimeException("Uloga nije pronađena."));
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case "admin":
+                        AuthRole adminRole = roleRepo.findByLabel("ADMIN")
+                                .orElseThrow(() -> new RuntimeException("Admin uloga nije pronađena."));
+                        roles.add(adminRole);
+
+                        break;
+                    default:
+                        AuthRole userRole = roleRepo.findByLabel("USER")
+                                .orElseThrow(() -> new RuntimeException("Uloga nije pronađena."));
+                        roles.add(userRole);
+                }
+            });
+        }
+
+        user.setRoles(roles);
+        userRepo.save(user);
+
+        return new ResponseEntity<>(new MessageResponse("Korisnik uspješno registriran!"), HttpStatus.OK);
+    }
 }

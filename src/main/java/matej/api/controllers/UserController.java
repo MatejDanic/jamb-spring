@@ -3,6 +3,8 @@ package matej.api.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.UserService;
 import matej.models.AuthUser;
+import matej.models.MessageResponse;
 
 
 @RestController
@@ -29,19 +32,24 @@ public class UserController {
 	}
 
 	@GetMapping("/{id}")
-	public AuthUser getUserById(@PathVariable int id) {
-		return userService.getUserById(id);
-	}
+	public ResponseEntity<Object> getUserById(@PathVariable int id) {
+        try {
+            AuthUser user = userService.getUserById(id);
+			return new ResponseEntity<>(user, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+    }
 
-	@PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
 	@DeleteMapping("/{id}")
-	public void deleteUserById(@PathVariable int id) {
-        userService.deleteUserById(id);
-	}
-
-	@GetMapping("/{id}/scores")
-	public void getUserScores(@PathVariable int id) {
-        userService.getUserScores(id);
+	public ResponseEntity<Object> deleteUserById(@PathVariable int id) {
+		try {
+            userService.deleteUserById(id);
+			return new ResponseEntity<>(new MessageResponse("Korisnik uspješno izbrisan."), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 }
 
