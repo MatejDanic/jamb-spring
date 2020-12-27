@@ -1,6 +1,5 @@
 package matej.api.controllers;
 
-import java.util.List;
 import java.util.Map;
 
 // import com.google.common.util.concurrent.RateLimiter;
@@ -23,16 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import matej.api.services.FormService;
 import matej.exceptions.IllegalMoveException;
 import matej.exceptions.InvalidOwnershipException;
-import matej.models.GameBox;
-import matej.models.GameDice;
-import matej.models.GameForm;
 import matej.models.MessageResponse;
 import matej.models.types.BoxType;
-import matej.models.GameColumn;
 import matej.security.jwt.JwtUtils;
 
 @RestController
-@CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
+@CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
 @RequestMapping("/forms")
 public class FormController {
 
@@ -70,8 +65,7 @@ public class FormController {
 	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody BoxType boxType) {
 		try {
-			return new ResponseEntity<>(
-					formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, boxType),
+			return new ResponseEntity<>(formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, boxType),
 					HttpStatus.OK);
 		} catch (IllegalMoveException | InvalidOwnershipException e) {
 			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
@@ -83,8 +77,9 @@ public class FormController {
 			@PathVariable(value = "id") int id, @PathVariable(value = "columnTypeId") int columnTypeId,
 			@PathVariable(value = "boxTypeId") int boxTypeId) {
 		try {
-			return new ResponseEntity<>(formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id,
-					columnTypeId, boxTypeId), HttpStatus.OK);
+			return new ResponseEntity<>(
+					formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id, columnTypeId, boxTypeId),
+					HttpStatus.OK);
 		} catch (IllegalMoveException | InvalidOwnershipException e) {
 			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
@@ -114,47 +109,71 @@ public class FormController {
 	}
 
 	@GetMapping("")
-	public List<GameForm> getFormList() {
-		return formService.getFormList();
+	public ResponseEntity<Object> getFormList() {
+		try {
+			return new ResponseEntity<>(formService.getFormList(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Object> getFormById(@PathVariable(value = "id") int id) {
-        try {
-            GameForm form = formService.getFormById(id);
-			return new ResponseEntity<>(form, HttpStatus.OK);
+		try {
+			return new ResponseEntity<>(formService.getFormById(id), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
 	@GetMapping("/{id}/columns")
-	public List<GameColumn> getFormColumns(@PathVariable(value = "id") int id) {
-		return formService.getFormById(id).getColumns();
+	public ResponseEntity<Object> getFormColumns(@PathVariable(value = "id") int id) {
+		try {
+			return new ResponseEntity<>(formService.getFormById(id).getColumns(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeId}")
-	public GameColumn getFormColumnByType(@PathVariable(value = "id") int id,
+	public ResponseEntity<Object> getFormColumnByType(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeId") int columnTypeId) {
-		return formService.getFormById(id).getColumnByTypeId(columnTypeId);
+		try {
+			return new ResponseEntity<>(formService.getFormById(id).getColumnByTypeId(columnTypeId), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeId}/boxes")
-	public List<GameBox> getFormColumnBoxes(@PathVariable(value = "id") int id,
+	public ResponseEntity<Object> getFormColumnBoxes(@PathVariable(value = "id") int id,
 			@PathVariable(value = "columnTypeId") int columnTypeId) {
-		return formService.getFormById(id).getColumnByTypeId(columnTypeId).getBoxes();
+		try {
+			return new ResponseEntity<>(formService.getFormById(id).getColumnByTypeId(columnTypeId).getBoxes(),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}/columns/{columnTypeId}/boxes/{boxTypeId}")
-	public GameBox getFormColumnBoxBoxByType(@PathVariable(value = "id") int id,
-			@PathVariable(value = "columnTypeId") int columnTypeId,
-			@PathVariable(value = "boxTypeId") int boxTypeId) {
-		return formService.getFormById(id).getColumnByTypeId(columnTypeId)
-				.getBoxByTypeId(boxTypeId);
+	public ResponseEntity<Object> getFormColumnBoxBoxByType(@PathVariable(value = "id") int id,
+			@PathVariable(value = "columnTypeId") int columnTypeId, @PathVariable(value = "boxTypeId") int boxTypeId) {
+		try {
+			return new ResponseEntity<>(
+					formService.getFormById(id).getColumnByTypeId(columnTypeId).getBoxByTypeId(boxTypeId),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping("/{id}/dice")
-	public List<GameDice> getFormDice(@PathVariable(value = "id") int id) {
-		return formService.getFormById(id).getDice();
+	public ResponseEntity<Object> getFormDice(@PathVariable(value = "id") int id) {
+		try {
+			return new ResponseEntity<>(formService.getFormById(id).getDice(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 }

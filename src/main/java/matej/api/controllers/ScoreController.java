@@ -1,8 +1,5 @@
 package matej.api.controllers;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.ScoreService;
 import matej.constants.GameConstants;
-import matej.models.GameScore;
 import matej.models.MessageResponse;
 
 
@@ -29,15 +25,18 @@ public class ScoreController {
     ScoreService scoreService;
 
     @GetMapping("")
-	public List<GameScore> getScores() {
-		return scoreService.getScores();
+	public ResponseEntity<Object>  getScores() {
+		try {
+			return new ResponseEntity<>(scoreService.getScores(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 	
     @GetMapping("/{id}")
 	public ResponseEntity<Object> getScoreById(@PathVariable int id) {
         try {
-            GameScore score = scoreService.getScoreById(id);
-			return new ResponseEntity<>(score, HttpStatus.OK);
+			return new ResponseEntity<>(scoreService.getScoreById(id), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
@@ -55,12 +54,20 @@ public class ScoreController {
 	}
 	
 	@GetMapping("/scoreboard")
-	public List<Map<String, String>> getScoreboard() {
-		return scoreService.getScoreboard(GameConstants.LEADERBOARD_LIMIT);
+	public ResponseEntity<Object> getScoreboard() {
+		try {
+			return new ResponseEntity<>(scoreService.getScoreboard(GameConstants.LEADERBOARD_LIMIT), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	@GetMapping("/leader")
-	public String getCurrentWeekLeader() {
-		return scoreService.getCurrentWeekLeader();
+	public ResponseEntity<Object> getCurrentWeekLeader() {
+		try {
+			return new ResponseEntity<>(scoreService.getCurrentWeekLeader(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		}
 	}
 }
