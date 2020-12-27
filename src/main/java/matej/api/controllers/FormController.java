@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.FormService;
+import matej.api.services.UserService;
 import matej.exceptions.IllegalMoveException;
 import matej.exceptions.InvalidOwnershipException;
-import matej.models.MessageResponse;
+import matej.payload.response.MessageResponse;
 import matej.models.types.BoxType;
 import matej.security.jwt.JwtUtils;
 
@@ -35,6 +36,9 @@ public class FormController {
 	FormService formService;
 
 	@Autowired
+	UserService userService;
+
+	@Autowired
 	JwtUtils jwtUtils;
 
 	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
@@ -45,8 +49,8 @@ public class FormController {
 		try {
 			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)),
 					HttpStatus.OK);
-		} catch (UsernameNotFoundException e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (UsernameNotFoundException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -54,10 +58,12 @@ public class FormController {
 	public ResponseEntity<Object> rollDice(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody Map<Integer, Boolean> diceToThrow) {
 		try {
-			return new ResponseEntity<>(
-					formService.rollDice(jwtUtils.getUsernameFromHeader(headerAuth), id, diceToThrow), HttpStatus.OK);
-		} catch (InvalidOwnershipException | IllegalMoveException e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+			if (!userService.checkFormOwnership(jwtUtils.getUsernameFromHeader(headerAuth), id)) {
+				throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku.");
+			}
+			return new ResponseEntity<>(formService.rollDice(id, diceToThrow), HttpStatus.OK);
+		} catch (InvalidOwnershipException | IllegalMoveException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -65,10 +71,12 @@ public class FormController {
 	public ResponseEntity<Object> announce(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id, @RequestBody BoxType boxType) {
 		try {
-			return new ResponseEntity<>(formService.announce(jwtUtils.getUsernameFromHeader(headerAuth), id, boxType),
-					HttpStatus.OK);
-		} catch (IllegalMoveException | InvalidOwnershipException e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+			if (!userService.checkFormOwnership(jwtUtils.getUsernameFromHeader(headerAuth), id)) {
+				throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku.");
+			}
+			return new ResponseEntity<>(formService.announce(id, boxType), HttpStatus.OK);
+		} catch (IllegalMoveException | InvalidOwnershipException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -77,11 +85,14 @@ public class FormController {
 			@PathVariable(value = "id") int id, @PathVariable(value = "columnTypeId") int columnTypeId,
 			@PathVariable(value = "boxTypeId") int boxTypeId) {
 		try {
+			if (!userService.checkFormOwnership(jwtUtils.getUsernameFromHeader(headerAuth), id)) {
+				throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku.");
+			}
 			return new ResponseEntity<>(
-					formService.fillBox(jwtUtils.getUsernameFromHeader(headerAuth), id, columnTypeId, boxTypeId),
+					formService.fillBox(id, columnTypeId, boxTypeId),
 					HttpStatus.OK);
-		} catch (IllegalMoveException | InvalidOwnershipException e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (IllegalMoveException | InvalidOwnershipException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -90,10 +101,13 @@ public class FormController {
 	public ResponseEntity<Object> deleteFormById(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id) {
 		try {
-			formService.deleteFormById(jwtUtils.getUsernameFromHeader(headerAuth), id);
+			if (!userService.checkFormOwnership(jwtUtils.getUsernameFromHeader(headerAuth), id)) {
+				throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku.");
+			}
+			formService.deleteFormById(id);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} catch (InvalidOwnershipException e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (InvalidOwnershipException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -101,10 +115,13 @@ public class FormController {
 	public ResponseEntity<Object> restartFormById(@RequestHeader(value = "Authorization") String headerAuth,
 			@PathVariable(value = "id") int id) {
 		try {
-			formService.restartFormById(jwtUtils.getUsernameFromHeader(headerAuth), id);
+			if (!userService.checkFormOwnership(jwtUtils.getUsernameFromHeader(headerAuth), id)) {
+				throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku.");
+			}
+			formService.restartFormById(id);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} catch (InvalidOwnershipException e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (InvalidOwnershipException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -112,8 +129,8 @@ public class FormController {
 	public ResponseEntity<Object> getFormList() {
 		try {
 			return new ResponseEntity<>(formService.getFormList(), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -121,8 +138,8 @@ public class FormController {
 	public ResponseEntity<Object> getFormById(@PathVariable(value = "id") int id) {
 		try {
 			return new ResponseEntity<>(formService.getFormById(id), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -130,8 +147,8 @@ public class FormController {
 	public ResponseEntity<Object> getFormColumns(@PathVariable(value = "id") int id) {
 		try {
 			return new ResponseEntity<>(formService.getFormById(id).getColumns(), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -140,8 +157,8 @@ public class FormController {
 			@PathVariable(value = "columnTypeId") int columnTypeId) {
 		try {
 			return new ResponseEntity<>(formService.getFormById(id).getColumnByTypeId(columnTypeId), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -151,8 +168,8 @@ public class FormController {
 		try {
 			return new ResponseEntity<>(formService.getFormById(id).getColumnByTypeId(columnTypeId).getBoxes(),
 					HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -163,8 +180,8 @@ public class FormController {
 			return new ResponseEntity<>(
 					formService.getFormById(id).getColumnByTypeId(columnTypeId).getBoxByTypeId(boxTypeId),
 					HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -172,8 +189,8 @@ public class FormController {
 	public ResponseEntity<Object> getFormDice(@PathVariable(value = "id") int id) {
 		try {
 			return new ResponseEntity<>(formService.getFormById(id).getDice(), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(new MessageResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 }

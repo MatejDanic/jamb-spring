@@ -52,6 +52,10 @@ public class AuthUser {
     @JoinTable(name = "auth_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<AuthRole> roles;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
+    private Preference preference;
+
     public AuthUser() {
     }
 
@@ -115,5 +119,14 @@ public class AuthUser {
             string += role.getLabel() + ": " + role.getdescription() + "\n";
         }
 		return string;
-	}
+    }
+
+    public Preference getPreference() {
+        return preference;
+    }
+
+    public void setPreference(Preference preference) {
+        this.preference = preference;
+    }
+
 }
