@@ -22,5 +22,4 @@ public class HomeController {
 			e.printStackTrace();
 		}
 	}
-
 }

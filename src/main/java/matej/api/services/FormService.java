@@ -62,22 +62,22 @@ public class FormService {
 	UserRepository userRepo;
 
 	/**
-	 * Creates or retrieves existing {@link Form} Object for the current {@link User}.
+	 * Creates or retrieves existing {@link Form} Object for the current
+	 * {@link User}.
 	 * 
-	 * @param username      the username of the current user
+	 * @param username the username of the current user
 	 * 
 	 * @return {@link Form} the form that the game will be played on
 	 * 
 	 * @throws UsernameNotFoundException if user with given username does not exist
 	 */
 	public GameForm initializeForm(String username) throws UsernameNotFoundException {
-		AuthUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
+		AuthUser user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		if (user.getForm() != null) {
-			// System.out.println(formRepo.findById(user.getForm().getId()).get());
 			return formRepo.findById(user.getForm().getId()).get();
 		} else {
 			GameForm form = GameFactory.createForm(user, columnTypeRepo.findAll(), boxTypeRepo.findAll());
-			// System.out.println(form);
 			return formRepo.save(form);
 		}
 	}
@@ -86,13 +86,11 @@ public class FormService {
 	 * Deletes {@link Form} object from database repository.
 	 * 
 	 * @param username the username of the form owner
-	 * @param id the id of the form
+	 * @param id       the id of the form
 	 * 
 	 * @throws InvalidOwnershipException if form does not belong to user
 	 */
-	public void deleteFormById(String username, int id) throws InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
+	public void deleteFormById(int id) throws InvalidOwnershipException {
 		formRepo.deleteById(id);
 	}
 
@@ -100,26 +98,28 @@ public class FormService {
 	 * Deletes {@link Form} object from database repository.
 	 * 
 	 * @param username the username of the form owner
-	 * @param id the id of the form
+	 * @param id       the id of the form
 	 * 
 	 * @throws InvalidOwnershipException if form does not belong to user
 	 */
-	public void restartFormById(String username, int id) throws InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
+	public void restartFormById(int id) throws InvalidOwnershipException {
 		GameForm form = getFormById(id);
 		form.setAnnouncement(null);
 		form.setRollCount(0);
 		for (GameColumn column : form.getColumns()) {
 			for (GameBox box : column.getBoxes()) {
 				box.setValue(0);
-				if (column.getColumnType().getLabel().equals("ANY_DIRECTION") || column.getColumnType().getLabel().equals("ANNOUNCEMENT"))
+				if (column.getColumnType().getLabel().equals("ANY_DIRECTION")
+						|| column.getColumnType().getLabel().equals("ANNOUNCEMENT"))
 					box.setAvailable(true);
-				else if (column.getColumnType().getLabel().equals("DOWNWARDS") && box.getBoxType().getLabel().equals("ONES"))
+				else if (column.getColumnType().getLabel().equals("DOWNWARDS")
+						&& box.getBoxType().getLabel().equals("ONES"))
 					box.setAvailable(true);
-				else if (column.getColumnType().getLabel().equals("UPWARDS") && box.getBoxType().getLabel().equals("JAMB"))
+				else if (column.getColumnType().getLabel().equals("UPWARDS")
+						&& box.getBoxType().getLabel().equals("JAMB"))
 					box.setAvailable(true);
-				else box.setAvailable(false);
+				else
+					box.setAvailable(false);
 				box.setFilled(false);
 			}
 		}
@@ -129,8 +129,8 @@ public class FormService {
 		formRepo.save(form);
 	}
 
-	public void saveScore(AuthUser user, GameForm form) {
-		GameScore score = GameFactory.createScore(user, form.calculateFinalSum());
+	public void saveScore(GameForm form) {
+		GameScore score = GameFactory.createScore(form.getUser(), form.calculateFinalSum());
 		scoreRepo.save(score);
 	}
 
@@ -143,20 +143,17 @@ public class FormService {
 	}
 
 	public GameBox getColumnBox(int id, int columnTypeId, int boxTypeId) {
-		return getFormById(id).getColumnByTypeId(columnTypeId)
-				.getBoxByTypeId(boxTypeId);
+		return getFormById(id).getColumnByTypeId(columnTypeId).getBoxByTypeId(boxTypeId);
 	}
 
 	public List<GameForm> getFormList() {
 		return formRepo.findAll();
 	}
 
-	public List<GameDice> rollDice(String username, int id, Map<Integer, Boolean> diceToThrow)
+	public List<GameDice> rollDice(int id, Map<Integer, Boolean> diceToThrow)
 			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Forma s id-em " + id + " ne pripada korisniku " + username + ".");
-		GameForm form = getFormById(id);
 
+		GameForm form = getFormById(id);
 		if (form.getRollCount() == 0)
 			diceToThrow.replaceAll((k, v) -> v = true);
 		else if (form.getRollCount() == GameConstants.NUM_OF_ROLLS)
@@ -172,7 +169,8 @@ public class FormService {
 		for (Map.Entry<Integer, Boolean> entry : diceToThrow.entrySet()) {
 			for (GameDice d : dice) {
 				if (entry.getKey() == d.getOrdinalNumber()) {
-					if (entry.getValue()) d.roll();
+					if (entry.getValue())
+						d.roll();
 					break;
 				}
 			}
@@ -182,30 +180,21 @@ public class FormService {
 		return form.getDice();
 	}
 
-	public BoxType announce(String username, int formId, BoxType boxType)
-			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, formId))
-			throw new InvalidOwnershipException("Forma s id-em " + formId + " ne pripada korisniku " + username + ".");
+	public BoxType announce(int formId, BoxType boxType) throws IllegalMoveException, InvalidOwnershipException {
 
 		GameForm form = getFormById(formId);
-
 		if (form.getAnnouncement() != null)
 			throw new IllegalMoveException("Najava je već iskorištena!");
 		if (form.getRollCount() >= 2)
 			throw new IllegalMoveException("Najava nije dostupna nakon drugog bacanja!");
-		
+
 		form.setAnnouncement(boxType);
 		formRepo.save(form);
 		return boxType;
 	}
 
-	public int fillBox(String username, int id, int columnTypeId, int boxTypeId)
-			throws IllegalMoveException, InvalidOwnershipException {
-		if (!checkOwnership(username, id))
-			throw new InvalidOwnershipException("Form s id-em " + id + " ne pripada korisniku " + username + ".");
+	public int fillBox(int id, int columnTypeId, int boxTypeId) throws IllegalMoveException, InvalidOwnershipException {
 
-		AuthUser user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
 		GameForm form = getFormById(id);
 		GameColumn column = form.getColumnByTypeId(columnTypeId);
 		GameBox box = column.getBoxByTypeId(boxTypeId);
@@ -226,7 +215,7 @@ public class FormService {
 		column.setForm(form);
 
 		if (form.isCompleted()) {
-			saveScore(user, form);
+			saveScore(form);
 		} else {
 			form.setRollCount(0);
 			form.setAnnouncement(null);
@@ -248,15 +237,8 @@ public class FormService {
 			GameBox nextBox = column.getBoxByTypeId(boxTypeId);
 			nextBox.setAvailable(true);
 			formRepo.save(form);
-		} catch (IndexOutOfBoundsException e) {
-			System.out.println(e.getMessage());
+		} catch (IndexOutOfBoundsException exc) {
+			System.out.println(exc.getMessage());
 		}
 	}
-
-	private boolean checkOwnership(String username, int formId) {
-		AuthUser user = userRepo.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
-		return user.getForm().getId() == formId;
-	}
-
 }

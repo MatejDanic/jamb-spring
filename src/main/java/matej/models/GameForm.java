@@ -30,7 +30,7 @@ public class GameForm {
 	private int id;
 
 	@OneToOne
-    @JsonIgnoreProperties({"scores", "form"})
+    @JsonIgnore
 	@JoinColumn(name = "user_id", nullable = false)
 	private AuthUser user;
 	
