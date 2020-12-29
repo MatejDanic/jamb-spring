@@ -17,9 +17,11 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import matej.security.services.UserDetailsServiceImpl;
+import matej.api.services.UserDetailsServiceImpl;
+import matej.components.JwtUtils;
 
 public class AuthTokenFilter extends OncePerRequestFilter {
+
 	@Autowired
 	private JwtUtils jwtUtils;
 

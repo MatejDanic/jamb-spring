@@ -1,4 +1,4 @@
-package matej.payload.request;
+package matej.models.payload.request;
 
 public class PreferenceRequest {
 

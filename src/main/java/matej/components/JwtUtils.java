@@ -1,4 +1,4 @@
-package matej.security.jwt;
+package matej.components;
 
 import java.util.Date;
 
@@ -14,7 +14,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import matej.security.services.UserDetailsImpl;
+import matej.models.UserDetailsImpl;
 
 @Component
 public class JwtUtils {
@@ -39,7 +39,7 @@ public class JwtUtils {
 				.compact();
 	}
 
-	protected String getUsernameFromJwtToken(String token) {
+	public String getUsernameFromJwtToken(String token) {
 		return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
 	}
 
@@ -51,9 +51,17 @@ public class JwtUtils {
 			} 
 		}
 		return null;
+	}
+	
+	public String getUsernameFromToken(String token) {
+		String username = "";
+		if (token != null && token != "" || validateJwtToken(token)) {
+			username = getUsernameFromJwtToken(token);
+		}
+        return username;
     }
 
-	protected boolean validateJwtToken(String authToken) {
+	public boolean validateJwtToken(String authToken) {
 		try {
 			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
 			return true;
@@ -68,7 +76,6 @@ public class JwtUtils {
 		} catch (IllegalArgumentException exc) {
 			logger.error("JWT claims string is empty: {}", exc.getMessage());
 		}
-
 		return false;
 	}
 

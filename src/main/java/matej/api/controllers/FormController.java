@@ -2,8 +2,6 @@ package matej.api.controllers;
 
 import java.util.Map;
 
-// import com.google.common.util.concurrent.RateLimiter;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,9 +22,9 @@ import matej.api.services.FormService;
 import matej.api.services.UserService;
 import matej.exceptions.IllegalMoveException;
 import matej.exceptions.InvalidOwnershipException;
-import matej.payload.response.MessageResponse;
+import matej.models.payload.response.MessageResponse;
 import matej.models.types.BoxType;
-import matej.security.jwt.JwtUtils;
+import matej.components.JwtUtils;
 
 @RestController
 @CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
@@ -41,15 +40,22 @@ public class FormController {
 	@Autowired
 	JwtUtils jwtUtils;
 
-	// private final RateLimiter rateLimiter = RateLimiter.create(0.2);
-
 	@PutMapping("")
 	public ResponseEntity<Object> initializeForm(@RequestHeader(value = "Authorization") String headerAuth) {
-		// if (!rateLimiter.tryAcquire(1)) return null;
 		try {
 			return new ResponseEntity<>(formService.initializeForm(jwtUtils.getUsernameFromHeader(headerAuth)),
 					HttpStatus.OK);
 		} catch (UsernameNotFoundException exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PostMapping("")
+	public ResponseEntity<Object> newForm(@RequestHeader(value = "Authorization") String headerAuth) {
+		try {
+			return new ResponseEntity<>(formService.newForm(jwtUtils.getUsernameFromHeader(headerAuth)),
+					HttpStatus.OK);
+		} catch (UsernameNotFoundException | InvalidOwnershipException exc) {
 			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}

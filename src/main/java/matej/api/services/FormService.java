@@ -82,6 +82,18 @@ public class FormService {
 		}
 	}
 
+	public GameForm newForm(String username) throws UsernameNotFoundException, InvalidOwnershipException {
+		AuthUser user = userRepo.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Korisnik s imenom " + username + " nije pronađen."));
+		if (user.getForm() != null) {
+			restartFormById(user.getForm().getId());
+			return formRepo.findById(user.getForm().getId()).get();
+		} else {
+			GameForm form = GameFactory.createForm(user, columnTypeRepo.findAll(), boxTypeRepo.findAll());
+			return formRepo.save(form);
+		}
+	}
+
 	/**
 	 * Deletes {@link Form} object from database repository.
 	 * 

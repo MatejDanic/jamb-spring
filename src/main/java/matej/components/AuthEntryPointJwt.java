@@ -1,4 +1,4 @@
-package matej.security.jwt;
+package matej.components;
 
 import java.io.IOException;
 
