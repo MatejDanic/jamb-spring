@@ -16,7 +16,6 @@ public class ColumnType {
 	@Id
 	private int id;
 	
-	
 	@Column(name = "label", nullable = false)
 	private String label;
 

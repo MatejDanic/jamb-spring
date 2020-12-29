@@ -11,7 +11,7 @@ import matej.api.repositories.UserRepository;
 import matej.models.AuthUser;
 import matej.models.GameScore;
 import matej.models.Preference;
-import matej.payload.request.PreferenceRequest;
+import matej.models.payload.request.PreferenceRequest;
 
 /**
  * Service Class for managing {@link User} repostiory

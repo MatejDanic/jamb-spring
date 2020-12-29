@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.UserService;
 import matej.exceptions.InvalidOwnershipException;
-import matej.payload.request.PreferenceRequest;
-import matej.payload.response.MessageResponse;
-import matej.security.jwt.JwtUtils;
+import matej.models.payload.request.PreferenceRequest;
+import matej.models.payload.response.MessageResponse;
+import matej.components.JwtUtils;
 
 @RestController
 @CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
@@ -44,6 +44,15 @@ public class UserController {
 	public ResponseEntity<Object> getUserById(@PathVariable int id) {
 		try {
 			return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+		} catch (Exception exc) {
+			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/{id}/form")
+	public ResponseEntity<Object> getUserForm(@PathVariable int id) {
+		try {
+			return new ResponseEntity<>(userService.getUserById(id).getForm(), HttpStatus.OK);
 		} catch (Exception exc) {
 			return new ResponseEntity<>(new MessageResponse(exc.getMessage()), HttpStatus.BAD_REQUEST);
 		}

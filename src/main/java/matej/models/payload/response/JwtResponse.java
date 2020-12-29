@@ -1,4 +1,4 @@
-package matej.payload.response;
+package matej.models.payload.response;
 
 import java.util.List;
 

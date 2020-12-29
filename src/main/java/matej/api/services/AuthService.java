@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 
 import matej.models.AuthRole;
 import matej.models.AuthUser;
-import matej.payload.request.LoginRequest;
-import matej.payload.request.RegisterRequest;
-import matej.payload.response.JwtResponse;
+import matej.models.payload.request.LoginRequest;
+import matej.models.payload.request.RegisterRequest;
+import matej.models.payload.response.JwtResponse;
 import matej.api.repositories.RoleRepository;
 import matej.api.repositories.UserRepository;
 import matej.api.services.AuthService;
 import matej.exceptions.UsernameTakenException;
-import matej.security.jwt.JwtUtils;
-import matej.security.services.UserDetailsImpl;
+import matej.components.JwtUtils;
+import matej.models.UserDetailsImpl;
 
 @Service
 public class AuthService {

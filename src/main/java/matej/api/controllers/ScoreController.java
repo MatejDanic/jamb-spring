@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import matej.api.services.ScoreService;
 import matej.constants.GameConstants;
-import matej.payload.response.MessageResponse;
+import matej.models.payload.response.MessageResponse;
 
 
 @RestController

@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import matej.payload.response.MessageResponse;
-import matej.payload.request.LoginRequest;
-import matej.payload.request.RegisterRequest;
+import matej.models.payload.response.MessageResponse;
+import matej.models.payload.request.LoginRequest;
+import matej.models.payload.request.RegisterRequest;
 import matej.api.services.AuthService;
 
 @RestController

@@ -1,4 +1,4 @@
-package matej.security;
+package matej.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -14,14 +14,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import matej.security.jwt.AuthEntryPointJwt;
+import matej.components.AuthEntryPointJwt;
 import matej.security.jwt.AuthTokenFilter;
-import matej.security.services.UserDetailsServiceImpl;
+import matej.api.services.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(/*securedEnabled = true, jsr250Enabled = true, */prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 
