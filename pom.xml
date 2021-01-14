@@ -58,7 +58,7 @@ https://maven.apache.org/xsd/maven-4.0.0.xsd">
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
-			<version>1.2.32</version>
+			<version>1.5.2</version>
 		</dependency>
 	</dependencies>
 	<build>

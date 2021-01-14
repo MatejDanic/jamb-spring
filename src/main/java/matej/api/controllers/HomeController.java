@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
 @RequestMapping("")
 public class HomeController {
-
+	
 	@GetMapping("/api")
 	public void home(HttpServletResponse response) {
 		try {
-			response.sendRedirect("/swagger-ui.html");
+			response.sendRedirect("/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

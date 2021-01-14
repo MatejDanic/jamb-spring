@@ -10,9 +10,8 @@ import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 public class CustomHandshakeHandler extends DefaultHandshakeHandler {
     @Override
-    protected Principal determineUser(ServerHttpRequest request,
-                                      WebSocketHandler wsHandler,
-                                      Map<String, Object> attributes) {
+    protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler,
+            Map<String, Object> attributes) {
         // generate user name by UUID
         return new StompPrincipal(UUID.randomUUID().toString());
     }

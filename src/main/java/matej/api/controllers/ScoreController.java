@@ -18,7 +18,7 @@ import matej.models.payload.response.MessageResponse;
 
 @RestController
 @CrossOrigin(origins={"*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com"})
-@RequestMapping("/scores")
+@RequestMapping("/api/scores")
 public class ScoreController {
 
     @Autowired
