@@ -22,7 +22,7 @@ import matej.components.JwtUtils;
 
 @RestController
 @CrossOrigin(origins = { "*", "http://www.jamb.com.hr", "https://jamb-react.herokuapp.com" })
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
 	@Autowired
