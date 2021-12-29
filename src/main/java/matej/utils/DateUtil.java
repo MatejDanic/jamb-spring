@@ -26,7 +26,7 @@ public final class DateUtil {
 		if (date1 == null || date2 == null) {
 			throw new IllegalArgumentException("Datumi nisu valjani");
 		}
-		TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+		TemporalField woy = WeekFields.of(Locale.getDefault()).weekOfYear();
 		return (date1.getYear() == date2.getYear() &&
 				date1.get(woy) == date2.get(woy));
 	}
